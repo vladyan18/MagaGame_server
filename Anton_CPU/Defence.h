@@ -1,20 +1,28 @@
 #pragma once
 #include "Minister.h"
+#include <deque>
+#include <listofgovernments.h>
+
+struct NukeInAir
+{
+    int from;
+    int lifetime;
+    int count;
+};
+
 class Defence : public Minister
 {
 public:
-	Defence(int countOfTeam);
+    Defence(int countOfTeam, ListOfGovernments*);
 	Defence();
-
+    deque <NukeInAir> nukesToUs;
 	int getNuclear();
+    void checkNukes(Government&);
+    void explodeNuke(Government&, NukeInAir);
 	int getMissleDefence();
-	int getNuclearOnYou1(int NumOfTeam);
-	int getNuclearOnYou2(int NumOfTeam);
-
+    ListOfGovernments *governments;
 	void setNuclear(int newNuclear);
 	void setMissleDefence(int newMissleDefence);
-	void setNuclearOnYou1(int numOfTeam, int newNuclearOnYou1);
-	void setNuclearOnYou2(int numOfTeam, int newNuclearOnYou2);
 
 	//увеличение кол-ва ядерных ракет
     int IncreaseCountOfNuclear(Government &its, int countOfNuclear);
@@ -27,9 +35,9 @@ public:
 	//запуск ядерной ракеты
     int NuclearStrike(Government &its, Government &attack, int countOfNuclear);
 	//сбить ядерную ракету
-    int shootDownNucler(Government &its, Government &attack, int countOfMissle);
+    int shootDownNucler(Government &its, int countOfMissle);
 	//отменить ядерный удар
-    int stopNuclear(Government &its, Government &attack, int countOfNuclear);
+    int stopNuclear(Government &its, Government &attack);
 	//напасть на гос-во сухопутными силами
     int marinesAttack(Government &its, Government &attack);
 	//набег на государство 
@@ -39,6 +47,5 @@ public:
 private:
 	int nuclear;
 	int missileDefense;
-	int * nuclearOnYou1;//ракеты, выпущенные в предыдущем ходу
-	int * nuclearOnYou2; //ракеты выпущенные в этом ходу
+
 };

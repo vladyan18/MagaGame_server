@@ -4,11 +4,12 @@
 #include <QDebug>
 
 int Team::countOfTeams = 1;
-Team::Team(int num, int cOfTeams)
+Team::Team(int num, int cOfTeams, ListOfGovernments *govs)
 {
     numOfTeam = num;
     countOfTeams = cOfTeams;
-    government = new Government(numOfTeam,countOfTeams) ;
+    government = new Government(numOfTeam,countOfTeams, govs);
+    govs->addToList(num,government);
 }
 
 void Team::addCommand(Command com)
@@ -19,7 +20,7 @@ void Team::addCommand(Command com)
 Command Team::getTopCommand()
 {
     Command *ret = new Command;
-    int empty[6] = {-1,-1,-1,-1,-1, -1};
+    int empty[7] = {-1,-1,-1,-1,-1, -1, -1};
     *ret->args = *empty;
 
     if (!listOfCommands.empty())
@@ -45,7 +46,7 @@ void Team::readData()
     listOfCommands.clear();   
     do
     {
-        for (int i = 0; i<6; i++)
+        for (int i = 0; i<7; i++)
         {
             stream >> com.args[i];
         }
@@ -53,7 +54,6 @@ void Team::readData()
     } while (!stream.atEnd());
     numOfCommands = listOfCommands.size();
 }
-
 
 
 void Team::writeData()
@@ -66,22 +66,57 @@ void Team::writeData()
     stream.setRealNumberNotation(QTextStream::FixedNotation);
     stream.setRealNumberPrecision(0);
     stream  << government->getMoney() << endl
-    << 0 << endl
-   << 0 << endl;
-    for (int i = 0; i<9;i++)
+    << government->getNukes() << endl
+   << government->getMissles() << endl << government->getHappiness() << endl;
+    for (int i = 0; i<=9;i++)
     {
         stream << government->ministers[i]->getLvl()  << " ";
     }
     stream << endl;
+    stream << government->outCodes << endl;
+
     for (int i = 0; i<listOfDidCommands.size();i++)
     {
-        for (int j = 0; j<6;j++)
+        for (int j = 0; j<7;j++)
         {
             stream<< listOfDidCommands[i].args[j] << " ";
         }
         stream << listOfDidCommands[i].successful << endl;
     }
+    listOfDidCommands.clear();
     outputFile.close();
 }
 
+void Team::prepare()
+{
+    government->prepare();
+}
 
+int Team::sabotage(int numOfMin)
+{
+    qDebug() << "Приступаем к саботажу!";
+    for (int i = 0; i<listOfCommands.size();i++)
+    {
+
+        if (listOfCommands[i].args[0] == numOfMin)
+        {
+          listOfDidCommands.push_back(listOfCommands[i]);
+          listOfCommands[i].args[0] = -1;
+          listOfCommands[i].args[1] = -1;
+          listOfCommands[i].args[2] = -1;
+          listOfCommands[i].args[3] = -1;
+          listOfCommands[i].args[4] = -1;
+          listOfCommands[i].args[5] = -1;
+          listOfCommands[i].args[6] = -1;
+          qDebug() << "Саботаж удался!";
+          return 1;
+
+        }
+    }
+    return 0;
+}
+
+bool Team::isVerbed(int country, int min)
+{
+    return government->isVerbed(country,min);
+}

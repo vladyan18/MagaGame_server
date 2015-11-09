@@ -3,6 +3,7 @@
 #include <CPU/team.h>
 #include <vector>
 #include <QObject>
+#include <listofgovernments.h>
 using namespace std;
 
 class MainCPU : public QObject
@@ -10,6 +11,7 @@ class MainCPU : public QObject
     Q_OBJECT
 public:
     MainCPU();
+    ListOfGovernments lGovs;
     void  addTeam(int numberOfTeam);
     void processData();
 signals:

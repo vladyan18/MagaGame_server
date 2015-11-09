@@ -15,8 +15,12 @@ int MVD::suppressRebellion(Government &its)
 {
 	if (its.getMoney() >= COST_OF_SUPRESS_REBELLION)
 	{
+        if (its.isInRebellion) {its.outCodes += "203 ";}
+        else {its.outCodes += "204 ";}
+
 		its.setMoney(its.getMoney() - COST_OF_SUPRESS_REBELLION);
-		its.setHappiness(its.getHappiness() + INCREASE_HAPPINESS_AFTER_SUPRESS);
+        its.isInRebellion = false;
+        its.setHappiness(its.getHappiness() - DECREASE_HAPPINESS_AFTER_SUPRESS);
 	}
 }
 

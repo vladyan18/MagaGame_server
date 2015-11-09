@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     Anton_CPU/MVD.cpp \
     Anton_CPU/President.cpp \
     Anton_CPU/TSOP.cpp \
-    CPU/maincpu.cpp
+    CPU/maincpu.cpp \
+    listofgovernments.cpp
 
 
 
@@ -46,7 +47,8 @@ HEADERS  += mainwindow.h \
     Anton_CPU/MinisterOfJustice.h \
     Anton_CPU/MVD.h \
     Anton_CPU/President.h \
-    CPU/maincpu.h
+    CPU/maincpu.h \
+    listofgovernments.h
 
 
 

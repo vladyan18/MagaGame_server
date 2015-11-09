@@ -21,10 +21,6 @@ ForeignMinister::ForeignMinister(int countOfTeam)
 // доработать 
 int ForeignMinister::sabotage(Government &its, Government &attack, int numOfMinister)
 {
-	if (its.getMoney() > COST_OF_SABOTAGE)
-	{
-		its.setMoney(its.getMoney() - COST_OF_SABOTAGE);
-	}
 }
 
 int ForeignMinister::verb(Government &its, Government &attack, int numberOfMinister)
@@ -35,7 +31,7 @@ int ForeignMinister::verb(Government &its, Government &attack, int numberOfMinis
 		if (TSOP(getTSOPlvl(), attack.ministers[numberOfMinister]->getTSOPlvl()))
 		{
 			lvl++;
-			verbedList[attack.getNumber()][numberOfMinister] = true;
+            verbedList[attack.getNumber()-1][numberOfMinister] = true;
 			attack.ministers[numberOfMinister]->setWhooseRecruit(its.getNumber());
 		}
 	}
@@ -43,8 +39,9 @@ int ForeignMinister::verb(Government &its, Government &attack, int numberOfMinis
 //дописать
 int ForeignMinister::reverb(Government &its, Government &attack, int numberOfMinister)
 {
-	verbedList[attack.getNumber()][numberOfMinister] = false;
-	attack.ministers[numberOfMinister]->setWhooseRecruit(-1);
+    verbedList[attack.getNumber()-1][numberOfMinister-1] = false;
+    attack.ministers[numberOfMinister-1]->setWhooseRecruit(-1);
+    attack.outCodes += "101 ";
 }
 //дописать
 int ForeignMinister::order() {}
@@ -54,10 +51,11 @@ int ForeignMinister::kill(Government &its, Government &attack, int numberOfMinis
 	if ((its.getMoney() >= COST_OF_KILL))
 	{
 		its.setMoney(its.getMoney() - COST_OF_KILL);
-		if (TSOP(getTSOPlvl(), attack.ministers[numberOfMinister]->getTSOPlvl()))
+        if (TSOP(getTSOPlvl(), attack.ministers[numberOfMinister-1]->getTSOPlvl()))
 		{
 			lvl++;
-			attack.ministers[numberOfMinister]->setLvl(1);
+            attack.ministers[numberOfMinister-1]->setLvl(1);
+            attack.outCodes += QString::number(110 + numberOfMinister - 1);
 		}
 	}
 }

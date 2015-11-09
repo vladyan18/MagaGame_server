@@ -6,14 +6,14 @@ using namespace std;
 
 bool TSOP(double attackLvl, double defenceLvl);
 
-int MinisterFSB::recruitDefence(Government &its, int help[COUNT_OF_MINISTER])
+int MinisterFSB::recruitDefence(Government &its, int numOfMinister, int countOfHelp)
 {
-	if (its.getMoney() >= COST_OF_RECRUIT_DEFENCE)
+    if (its.getMoney() >= COST_OF_RECRUIT_DEFENCE || isDefending)
 	{
-		lvl++;
-		for (int i = 0;i < COUNT_OF_MINISTER;i++)
-			its.ministers[i]->setRecruitLvl(lvl*help[i] / 100); //i-ый элемент показывает, сколько % опыта перейдет i министру
-		its.setMoney(its.getMoney() - COST_OF_RECRUIT_DEFENCE);
+        //lvl++;
+        its.ministers[numOfMinister]->setRecruitLvl(its.ministers[3]->getLvl() * countOfHelp/100);
+        if (!isDefending){its.setMoney(its.getMoney() - COST_OF_RECRUIT_DEFENCE);}
+        isDefending = true;
 	}
 }
 
@@ -24,7 +24,7 @@ void MinisterFSB::getInformation()
 	fout.close();
 }
 
-int* MinisterFSB::findRecruited(Government &its, Government &searching)
+int MinisterFSB::findRecruited(Government &its, Government &searching)
 {
 	int countOfRecruited = 0;
 	int resultOfSearching[COUNT_OF_MINISTER];
@@ -64,5 +64,5 @@ int* MinisterFSB::findRecruited(Government &its, Government &searching)
 		}
 	}
 	
-	return answer;
+    return *answer;
 }

@@ -1,10 +1,11 @@
 #pragma once
 #include "Minister.h"
+#include "listofgovernments.h"
 class CommunicationMinister : public Minister
 {
 public:
 	CommunicationMinister() {}
-	CommunicationMinister(int countOfTeam);
+    CommunicationMinister(int countOfTeam, ListOfGovernments *gov);
 	void setItsSlander(bool newItsSlander, int numOfTeam);
 	//void setItsRebellion(int newItsRebellion);
 
@@ -14,7 +15,7 @@ public:
 	//сделать заявления в международные СМИ
     int accuse(Government &its, Government &attack);
 	//опровергнуть ложь
-    int disslander(Government &its, Government &attack);
+    int disslander(Government &its);
 	//улучшить настроение населения в своем государстве 
     int increaseHappiness(Government &its, int countOfUp);
 	//поджечь восстание
@@ -23,5 +24,7 @@ public:
 	void getInformation(int countOfTeam);
 private:
 	bool *itsSlander;		//номер государтсва, кинувшего ложь (-1, если отсутствует)
+    int countOfTeam;
+    ListOfGovernments *governments;
 	//int itsRebellion;	//номер государтсва, кинувшего вирус (-1, если отсутствует)
 };

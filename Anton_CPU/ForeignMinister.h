@@ -19,6 +19,7 @@ public:
     int order();
 	// получить информацию о министре внутренних дел
 	void getInformation(int countOfTeam);
+    bool **verbedList;
 private:
-	bool **verbedList;
+
 };
