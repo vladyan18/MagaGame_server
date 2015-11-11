@@ -4,6 +4,7 @@
 #include <vector>
 #include <QObject>
 #include <listofgovernments.h>
+#include <CPU/rialto.h>
 using namespace std;
 
 class MainCPU : public QObject
@@ -13,6 +14,7 @@ public:
     MainCPU();
     ListOfGovernments lGovs;
     void  addTeam(int numberOfTeam);
+    Rialto *rialto;
     void processData();
 signals:
     void signalNewCountOfTeams(int newCount);

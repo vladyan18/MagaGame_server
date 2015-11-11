@@ -48,21 +48,42 @@ for (int i=1;i<=numOfTeams;i++) {
 
 void MainWindow::on_pushButton_3_clicked()
 {
+    QByteArray doc;
+    QFile inpf;
     for (int i = 1;i<=numOfTeams;i++)
     {
         if (listClients[i]->connected)
         {
-         QByteArray doc;
-         QFile inpf(QString::number(i) + "_team_output.txt");
+
+         inpf.setFileName(QString::number(i) + "_team_output.txt");
          inpf.open(QFile::ReadOnly);
          doc = "3" + inpf.readAll();
          inpf.close();
 
+
          listClients[i]->socket->write(doc);
+
         }
         listClients[i]->receivedData = false;
     }
     updateList();
+
+
+
+    for (int i = 1;i<=numOfTeams;i++)
+    {
+        if (listClients[i]->connected)
+        {
+         while (listClients[i]->socket->waitForBytesWritten())
+         {}
+         inpf.setFileName(QString::number(i) + "_verb_matrix.txt");
+         inpf.open(QFile::ReadOnly);
+         doc = "4" + inpf.readAll();
+         inpf.close();
+         listClients[i]->socket->write(doc);
+        }
+    }
+
 
     ui->pushButton_4->setEnabled(true);
 }
@@ -73,6 +94,7 @@ void MainWindow::newuser() {
      QTcpSocket* clientSocket=_serv->nextPendingConnection();
 
      clientSocket->waitForReadyRead(2000);
+
 
      answ1 = clientSocket->read(1);
      name = clientSocket->readAll();
@@ -94,13 +116,23 @@ if ((num>numOfTeams)||(listClients[num]->connected == false))
      if(num>numOfTeams)
      {
      numOfTeams++;
-     }
 
      mcpu.addTeam(num);
+     }
+
 
     connect(listClients[num],SIGNAL(adapterSendReadClient(int)),this, SLOT(slotReadClient(int)));
     connect(listClients[num]->socket,SIGNAL(disconnected()),listClients[num], SLOT(onDisconnected()));
     connect(listClients[num],SIGNAL(doUpdateList()),this, SLOT(doUpdateList()));
+
+    QFile of(QString::number(num) + "_team_input.txt");
+    QTextStream stream(&of);
+    of.open(QFile::WriteOnly);
+    stream << "-1 -1 -1 -1 -1 -1 -1 \n";
+    of.close();
+
+    listClients[num]->receivedData = true;
+
     updateList();
    }
    else

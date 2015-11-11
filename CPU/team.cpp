@@ -4,11 +4,12 @@
 #include <QDebug>
 
 int Team::countOfTeams = 1;
-Team::Team(int num, int cOfTeams, ListOfGovernments *govs)
+Team::Team(int num, int cOfTeams, ListOfGovernments *govs, Rialto *rialto)
 {
+    this->rialto = rialto;
     numOfTeam = num;
     countOfTeams = cOfTeams;
-    government = new Government(numOfTeam,countOfTeams, govs);
+    government = new Government(numOfTeam,countOfTeams, govs, rialto);
     govs->addToList(num,government);
 }
 
@@ -65,14 +66,22 @@ void Team::writeData()
 
     stream.setRealNumberNotation(QTextStream::FixedNotation);
     stream.setRealNumberPrecision(0);
+
     stream  << government->getMoney() << endl
     << government->getNukes() << endl
-   << government->getMissles() << endl << government->getHappiness() << endl;
+    << government->getMissles() << endl
+    << government->getHappiness() << endl
+    << countOfTeams << endl
+    << government->getHeavyIndustrial() << endl
+    << government->getLightIndustrial() << endl
+    << government->getAgricultural() << endl;
+
     for (int i = 0; i<=9;i++)
     {
         stream << government->ministers[i]->getLvl()  << " ";
     }
     stream << endl;
+
     stream << government->outCodes << endl;
 
     for (int i = 0; i<listOfDidCommands.size();i++)
@@ -84,6 +93,18 @@ void Team::writeData()
         stream << listOfDidCommands[i].successful << endl;
     }
     listOfDidCommands.clear();
+    outputFile.close();
+
+    outputFile.setFileName(QString::number(numOfTeam) + "_verb_matrix.txt");
+    outputFile.open(QFile::WriteOnly);
+    for (int i=0; i<countOfTeams; i++)
+    {
+        for (int j = 0; j<10; j++)
+        {
+            stream << government->isVerbed(i,j) <<" ";
+        }
+        stream << endl;
+    }
     outputFile.close();
 }
 

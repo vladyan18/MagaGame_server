@@ -20,6 +20,8 @@ public:
 	// получить информацию о министре внутренних дел
 	void getInformation(int countOfTeam);
     bool **verbedList;
-private:
+    void updateVerbedList(int countOfTeam);
 
+private:
+    int countOfTeam;
 };

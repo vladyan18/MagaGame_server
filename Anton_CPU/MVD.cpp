@@ -26,15 +26,16 @@ int MVD::suppressRebellion(Government &its)
 
 int MVD::checkVerbed(Government &its)
 {
+    int answer = false;
 	if (its.getMoney() >= COST_OF_CHECK_VERBED)
 	{
 		its.setMoney(its.getMoney() - COST_OF_CHECK_VERBED);
-		int answer = false;
 		for (int i = 0; i < COUNT_OF_MINISTER;i++)
 			if (its.ministers[i]->getWhooseRecruit() != -1)
 				answer = true;
 		resultOfSearching = answer;
 	}
+    return answer;
 }
 //правильно казывать входные данные через getWhooseRecruit!
 int MVD::disverbed(Government &its, Government &attack, int numberOfMinister)
@@ -44,8 +45,13 @@ int MVD::disverbed(Government &its, Government &attack, int numberOfMinister)
 		its.setMoney(its.getMoney() - COST_OF_DISVERBED);
 		if (TSOP(getTSOPlvl(), attack.ministers[4]->getTSOPlvl()))
 		{
-			lvl++;
-			its.ministers[numberOfMinister]->setWhooseRecruit(-1);
+            lvl++;
+            Command fr;
+            fr.args[0] = 5;
+            fr.args[1] = 3;
+            fr.args[2] = its.getNumber();
+            fr.args[3] = numberOfMinister+1;
+            attack.doMIDCommand(fr);
 		}
 	}
 }

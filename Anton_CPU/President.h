@@ -1,5 +1,6 @@
 #pragma once
 #include "Minister.h"
+#include <listofgovernments.h>
 class President : public Minister
 {
 public:
@@ -7,5 +8,8 @@ public:
     int dismiss(Government &its, int numOfMinister);
 	// получить информацию о президенте
 	void getInformation();
-	President();
+    President(ListOfGovernments *govs);
+
+private:
+    ListOfGovernments *governments;
 };

@@ -8,19 +8,20 @@
 #include <CPU/team.h>
 #include <listofgovernments.h>
 #include <QString>
+#include <CPU/rialto.h>
 
 using namespace std;
 
 class Command;
 class Minister;
-class Government // pеализует государство 
+class Government // pРµР°Р»РёР·СѓРµС‚ РіРѕСЃСѓРґР°СЂСЃС‚РІРѕ 
 {
 public:
     Minister *ministers[COUNT_OF_MINISTER+1];
 	~Government();
 	Government();
 	Government(const Government &rhs);
-    Government(int itsNumber, int itsCountOfTeam, ListOfGovernments*);
+    Government(int itsNumber, int itsCountOfTeam, ListOfGovernments*, Rialto*);
 
 	double getMoney();
 	int getNumber();
@@ -34,11 +35,12 @@ public:
 	void setNumber(int newNumber);
 	void setCountOfTeam(int newCountOfTeam);
 	void setHappiness(short int newHappines);
-	//получить информацию о текущем состоянии гос-ва
+	//РїРѕР»СѓС‡РёС‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ С‚РµРєСѓС‰РµРј СЃРѕСЃС‚РѕСЏРЅРёРё РіРѕСЃ-РІР°
 	void getInformation();
-	//получить полную инфу о государстве
+	//РїРѕР»СѓС‡РёС‚СЊ РїРѕР»РЅСѓСЋ РёРЅС„Сѓ Рѕ РіРѕСЃСѓРґР°СЂСЃС‚РІРµ
 	void getFullInformation();
     void prepare();
+    void updateVerbedList(int countOfTeam);
     bool isVerbed(int country, int min);
     int doCommand(Command);
     int doPresidentCommand(Command);
@@ -52,11 +54,16 @@ public:
     int doMinHelCommand(Command);
     QString outCodes;
     bool isInRebellion = false;
+    long getHeavyIndustrial();
+    long getLightIndustrial();
+    long getAgricultural();
+    Rialto *rialto;
 private:
-	double money;								//казна
-	int number;									//номер государства
+	double money;								//РєР°Р·РЅР°
+	int number;									//РЅРѕРјРµСЂ РіРѕСЃСѓРґР°СЂСЃС‚РІР°
 	int countOfTeam;
 	short int happiness;
     ListOfGovernments *governments;
+
 
 };

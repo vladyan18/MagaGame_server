@@ -10,12 +10,20 @@ ForeignMinister::ForeignMinister(){}
 
 ForeignMinister::ForeignMinister(int countOfTeam)
 {
+    this->countOfTeam = countOfTeam;
 	verbedList = new bool*[countOfTeam];
 	for (int i = 0;i < countOfTeam;i++)
 	{
-		verbedList[i] = new bool[COUNT_OF_MINISTER];
-		verbedList[i][10] = false;
+        verbedList[i] = new bool[10];
 	}
+
+    for (int i = 0; i<countOfTeam; i++)
+    {
+        for (int j = 0 ; j<10; j++)
+        {
+            verbedList[i][j] = false;
+        }
+    }
 }
 
 // доработать 
@@ -39,7 +47,7 @@ int ForeignMinister::verb(Government &its, Government &attack, int numberOfMinis
 //дописать
 int ForeignMinister::reverb(Government &its, Government &attack, int numberOfMinister)
 {
-    verbedList[attack.getNumber()-1][numberOfMinister-1] = false;
+    verbedList[attack.getNumber()-1][numberOfMinister] = false;
     attack.ministers[numberOfMinister-1]->setWhooseRecruit(-1);
     attack.outCodes += "101 ";
 }
@@ -55,6 +63,7 @@ int ForeignMinister::kill(Government &its, Government &attack, int numberOfMinis
 		{
 			lvl++;
             attack.ministers[numberOfMinister-1]->setLvl(1);
+            verbedList[attack.getNumber()-1][numberOfMinister] = false;
             attack.outCodes += QString::number(110 + numberOfMinister - 1);
 		}
 	}
@@ -77,4 +86,33 @@ void ForeignMinister::getInformation(int countOfTeam)
 	ofstream fout("Civ.out", ios_base::app);
 	fout << "” министра иностранных дел " << lvl << " lvl" << endl;
 	fout.close();
+}
+
+void ForeignMinister:: updateVerbedList(int countOfTeam)
+{
+    this->countOfTeam = countOfTeam;
+    bool **newVerbedList = new bool*[countOfTeam];
+    for (int i = 0;i < countOfTeam;i++)
+    {
+        newVerbedList[i] = new bool[10];
+    }
+
+    for (int i = 0; i<countOfTeam; i++)
+    {
+        for (int j = 0 ; j<10; j++)
+        {
+            newVerbedList[i][j] = false;
+        }
+    }
+
+    for (int i = 0; i<countOfTeam-1; i++)
+    {
+        for (int j = 0 ; j<10; j++)
+        {
+            newVerbedList[i][j] = verbedList[i][j];
+        }
+    }
+
+    verbedList = newVerbedList;
+
 }

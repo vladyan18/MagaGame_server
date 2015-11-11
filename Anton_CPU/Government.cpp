@@ -24,15 +24,16 @@ void Government::setNumber(int newNumber) { number = newNumber; }
 void Government::setCountOfTeam(int newCountOfTeam) { countOfTeam = newCountOfTeam; }
 void Government::setHappiness(short int newHappiness) { happiness = newHappiness; }
 
-Government::Government(int itsNumber, int itsCountOfTeam, ListOfGovernments *govs)
+Government::Government(int itsNumber, int itsCountOfTeam, ListOfGovernments *govs, Rialto *rialto)
 {
+    this->rialto = rialto;
     governments = govs;
 	number = itsNumber;
 	countOfTeam = itsCountOfTeam;
 	money = START_MONEY;
 	happiness = MAX_HAPPINESS;
-    outCodes = "";
-	ministers[0] = new President();
+    outCodes = "215 ";
+    ministers[0] = new President(governments);
 	ministers[1] = new Finance();
     ministers[2] = new Defence(countOfTeam, governments);
 	ministers[3] = new MinisterFSB();
@@ -140,7 +141,10 @@ int Government::doMinFinCommand(Command com)
         return fin->increaseSphere(*this, com.args[2], com.args[3]);
         break;
     case 2:
-        // TO DO игра на бирже
+        return fin->play(*this, com.args[2], com.args[3]);
+        break;
+    case 3:
+        return fin->doTrans(*this, *governments->getPtrToGov(com.args[2]), com.args[3]);
         break;
     }
     return 0;
@@ -379,4 +383,29 @@ bool Government::isVerbed(int country, int min)
 {
     ForeignMinister *mid = (ForeignMinister*)(ministers[4]);
     return mid->verbedList[country][min];
+}
+
+long Government:: getHeavyIndustrial()
+{
+     Finance *fin = (Finance*)(ministers[1]);
+     return fin->getHeavyIndustry();
+}
+
+long Government::getLightIndustrial()
+{
+     Finance *fin = (Finance*)(ministers[1]);
+     return fin->getLightIndustry();
+}
+
+long Government::getAgricultural()
+{
+     Finance *fin = (Finance*)(ministers[1]);
+     return fin->getAgriculture();
+}
+
+void Government::updateVerbedList(int countOfTeam)
+{
+    this->countOfTeam = countOfTeam;
+     ForeignMinister *mid = (ForeignMinister*)(ministers[4]);
+     mid->updateVerbedList(countOfTeam);
 }

@@ -5,13 +5,19 @@
 
 MainCPU::MainCPU()
 {
+    rialto = new Rialto(&lGovs);
 }
 
 
 void MainCPU::addTeam(int numberOfTeam)
 {
-    Team *team = new Team(numberOfTeam, teams.size() + 1, &lGovs);
+    Team *team = new Team(numberOfTeam, teams.size() + 1, &lGovs, rialto);
     teams.push_back(*team);
+
+    for(int i = 0; i<teams.size()-1; i++)
+    {
+        teams[i].government->updateVerbedList(teams.size() );
+    }
 }
 
 void MainCPU::processData()
@@ -55,12 +61,10 @@ void MainCPU::processData()
     }
 
 
+    rialto->processData();
     for (int i = 0; i<teams.size();i++)
     {
         teams[i].writeData();
-                        qDebug() << "Выводим инфу!";
-        teams[i].government->getFullInformation();
-                        qDebug() << "Выводим полную инфу!";
     }
 
 }

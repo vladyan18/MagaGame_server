@@ -1,6 +1,7 @@
 #include "Government.h"
 #include "Finance.h"
 #include <fstream>
+#include <QDebug>
 
 using namespace std;
 
@@ -48,6 +49,35 @@ int Finance::increaseSphere(Government &its, int numberOfSphere, int number2OfSp
     {
         return 0;
     }
+}
+
+int Finance::play(Government &its, int price, int money)
+{
+    if (its.getMoney() >= money)
+    {
+        its.changeMoney( -money );
+        qDebug() << "Добавили игрока в биржу";
+        its.rialto->addPlayer(its.getNumber(), this->getLvl(), money, price);
+        return 1;
+    }
+    else
+    {
+        qDebug() << "Биржа, неудача";
+        return 0;
+    }
+    return 1;
+}
+
+int Finance::doTrans(Government &its, Government &to, int money)
+{
+    if (its.getMoney() >= money)
+    {
+        its.changeMoney(-money);
+        to.changeMoney( int(money*0.9) );
+        to.outCodes += "205 " + QString::number( int(money*0.9) ) + " " + QString::number( its.getNumber() ) + " ";
+        return 1;
+    }
+    else {return 0;}
 }
 
 Finance::Finance()

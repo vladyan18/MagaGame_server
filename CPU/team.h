@@ -5,13 +5,15 @@
 #include <Anton_CPU/Government.h>
 #include <QObject>
 #include <listofgovernments.h>
+#include <CPU/rialto.h>
 
 using namespace std;
+class Rialto;
 
 struct Command
 {
     int args[7];
-    bool successful = false;
+    int successful = 0;
 };
 
 class Government;
@@ -20,7 +22,7 @@ class ListOfGovernments;
 class Team
 {
 public:
-    Team(int, int, ListOfGovernments*);
+    Team(int, int, ListOfGovernments*, Rialto* );
     int numOfTeam;
     Command getTopCommand();
     void addCommand(Command);
@@ -32,6 +34,7 @@ public:
     int sabotage(int numOfMin);
     unsigned int numOfCommands;
     Government *government;
+    Rialto *rialto;
 
     deque< Command > listOfDidCommands;
 
