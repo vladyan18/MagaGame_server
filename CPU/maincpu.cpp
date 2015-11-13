@@ -11,7 +11,7 @@ MainCPU::MainCPU()
 
 void MainCPU::addTeam(int numberOfTeam)
 {
-    Team *team = new Team(numberOfTeam, teams.size() + 1, &lGovs, rialto);
+    Team *team = new Team(numberOfTeam, teams.size() + 1, &lGovs, rialto, &nukesInAir);
     teams.push_back(*team);
 
     for(int i = 0; i<teams.size()-1; i++)
@@ -64,6 +64,7 @@ void MainCPU::processData()
     rialto->processData();
     for (int i = 0; i<teams.size();i++)
     {
+        teams[i].postPrepare();
         teams[i].writeData();
     }
 

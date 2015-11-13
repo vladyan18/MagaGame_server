@@ -2,6 +2,7 @@
 #include "Minister.h"
 #include <deque>
 #include <listofgovernments.h>
+#include <CPU/nukesinair.h>
 
 struct NukeInAir
 {
@@ -18,9 +19,10 @@ public:
     deque <NukeInAir> nukesToUs;
 	int getNuclear();
     void checkNukes(Government&);
-    void explodeNuke(Government&, NukeInAir);
+    void explodeNuke(Government&, NukeRocket);
 	int getMissleDefence();
     ListOfGovernments *governments;
+    deque<NukeRocket> *nukesInAir;
 	void setNuclear(int newNuclear);
 	void setMissleDefence(int newMissleDefence);
 
@@ -48,4 +50,5 @@ private:
 	int nuclear;
 	int missileDefense;
 
+    int countOfTeams;
 };

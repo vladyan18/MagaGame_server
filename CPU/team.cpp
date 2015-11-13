@@ -4,12 +4,13 @@
 #include <QDebug>
 
 int Team::countOfTeams = 1;
-Team::Team(int num, int cOfTeams, ListOfGovernments *govs, Rialto *rialto)
+Team::Team(int num, int cOfTeams, ListOfGovernments *govs, Rialto *rialto, deque<NukeRocket> *nukesInAir)
 {
+    this->nukesInAir = nukesInAir;
     this->rialto = rialto;
     numOfTeam = num;
     countOfTeams = cOfTeams;
-    government = new Government(numOfTeam,countOfTeams, govs, rialto);
+    government = new Government(numOfTeam,countOfTeams, govs, rialto, nukesInAir);
     govs->addToList(num,government);
 }
 
@@ -72,13 +73,13 @@ void Team::writeData()
     << government->getMissles() << endl
     << government->getHappiness() << endl
     << countOfTeams << endl
-    << government->getHeavyIndustrial() << endl
-    << government->getLightIndustrial() << endl
+    << government->getHeavyIndustrial()<< endl
+    << government->getLightIndustrial()<< endl
     << government->getAgricultural() << endl;
 
     for (int i = 0; i<=9;i++)
     {
-        stream << government->ministers[i]->getLvl()  << " ";
+        stream << government->ministers[i]->getLvl() << " ";
     }
     stream << endl;
 
@@ -101,8 +102,9 @@ void Team::writeData()
     {
         for (int j = 0; j<10; j++)
         {
-            stream << government->isVerbed(i,j) <<" ";
+            stream << government->isVerbed(i,j) << " ";
         }
+
         stream << endl;
     }
     outputFile.close();
@@ -111,6 +113,11 @@ void Team::writeData()
 void Team::prepare()
 {
     government->prepare();
+}
+
+void Team::postPrepare()
+{
+    government->postPrepare();
 }
 
 int Team::sabotage(int numOfMin)

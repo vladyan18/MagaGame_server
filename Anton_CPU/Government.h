@@ -9,6 +9,7 @@
 #include <listofgovernments.h>
 #include <QString>
 #include <CPU/rialto.h>
+#include <CPU/nukesinair.h>
 
 using namespace std;
 
@@ -21,7 +22,7 @@ public:
 	~Government();
 	Government();
 	Government(const Government &rhs);
-    Government(int itsNumber, int itsCountOfTeam, ListOfGovernments*, Rialto*);
+    Government(int itsNumber, int itsCountOfTeam, ListOfGovernments*, Rialto*, deque<NukeRocket>*);
 
 	double getMoney();
 	int getNumber();
@@ -40,6 +41,7 @@ public:
 	//получить полную инфу о государстве
 	void getFullInformation();
     void prepare();
+    void postPrepare();
     void updateVerbedList(int countOfTeam);
     bool isVerbed(int country, int min);
     int doCommand(Command);
@@ -58,12 +60,14 @@ public:
     long getLightIndustrial();
     long getAgricultural();
     Rialto *rialto;
+    deque<NukeRocket> *nukesInAir;
 private:
 	double money;								//казна
 	int number;									//номер государства
 	int countOfTeam;
 	short int happiness;
     ListOfGovernments *governments;
+
 
 
 };

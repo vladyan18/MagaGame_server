@@ -74,12 +74,12 @@ void MainWindow::on_pushButton_3_clicked()
     {
         if (listClients[i]->connected)
         {
-         while (listClients[i]->socket->waitForBytesWritten())
-         {}
+
          inpf.setFileName(QString::number(i) + "_verb_matrix.txt");
          inpf.open(QFile::ReadOnly);
-         doc = "4" + inpf.readAll();
+         doc = "M \n" + inpf.readAll();
          inpf.close();
+
          listClients[i]->socket->write(doc);
         }
     }

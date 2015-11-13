@@ -18,6 +18,7 @@ Defence::Defence() {}
 Defence::Defence(int countOfTeam, ListOfGovernments *governments)
 {
     this->governments = governments;
+    this->countOfTeams = countOfTeam;
 	nuclear = 0;
 	missileDefense = 0;
 	for (int i = 0;i < countOfTeam;i++)
@@ -87,16 +88,22 @@ int  Defence::NuclearStrike(Government &its, Government &attack, int countOfNucl
     if (nuclear > 0)
     {
 	nuclear -= countOfNuclear;
-	Defence *attackDefence = (Defence*)(attack.ministers[2]);
 
-    NukeInAir *newNuke = new NukeInAir;
-    newNuke->from = its.getNumber();
-    newNuke->count = countOfNuclear;
-    newNuke->lifetime = 2;
-    attackDefence->nukesToUs.push_back(*newNuke);
+    NukeRocket *newNuke = new NukeRocket(its.getNumber(), attack.getNumber(), countOfNuclear);
+    its.nukesInAir->push_back(*newNuke);
     delete newNuke;
-    attack.outCodes += QString::number(3100 + its.getNumber() ) + " ";
-    // добавить оповещение всем!
+
+    Government *gov;
+
+    for (int i = 0; i < countOfTeams; i++)
+    {
+        gov = governments->getPtrToGov((i+1));
+        if ( gov->getMissles() > 0 )
+        {
+            gov->outCodes += "3000 " + QString::number(its.getNumber()) + " " ;
+        }
+    }
+
     return 1;
     }
     else return 0;
@@ -105,30 +112,66 @@ int  Defence::NuclearStrike(Government &its, Government &attack, int countOfNucl
 int Defence::shootDownNucler(Government &its, int countOfMissle)
 {
 
+    this->nukesInAir = its.nukesInAir;
+    NukeRocket *currentRocket;
     int result = 0, used = 0;
-    while (nukesToUs.size() > 0 && countOfMissle > 0)
-    {
-        if (nukesToUs[0].count > 0)
+
+    int toUs1 = 0;
+    for (int i = 0; i < nukesInAir->size(); i++)
+        if ( nukesInAir->at(i).to == its.getNumber() && nukesInAir->at(i).count > 0 )
         {
-            if (TSOP(its.ministers[2]->getTSOPlvl(), governments->getPtrToGov(nukesToUs[0].from)->ministers[2]->getTSOPlvl()))
+            toUs1++;
+        }
+            qDebug() << "РќР° РЅР°СЃ Р»РµС‚РёС‚ " + QString::number(toUs1);
+    while (nukesInAir->size() > 0 && countOfMissle > 0)
+    {
+        currentRocket = NULL;
+
+        for (int i = 0; i < nukesInAir->size(); i++)
+            if (nukesInAir->at(i).count > 0)
             {
-                qDebug() << "Ракета сбита!";
-            nukesToUs[0].count--;
-            } else qDebug() << "Промах!";
+              qDebug() << "Р’ РЅРµР±Рµ СЂР°РєРµС‚Р°!";
+              currentRocket = &(nukesInAir->at(i));
+              break;
+            }
+
+
+        if (currentRocket == NULL) {break;} //------------------------------------
+
+        if (toUs1 > 0)
+        {
+        for (int i = 0; i < nukesInAir->size(); i++)
+            if ( nukesInAir->at(i).to == its.getNumber() && nukesInAir->at(i).count > 0 )
+            {
+                currentRocket = &(nukesInAir->at(i));
+                break;
+            }
+        }
+
+
+            if (TSOP(its.ministers[2]->getTSOPlvl(), governments->getPtrToGov(currentRocket->from)->ministers[2]->getTSOPlvl()) )
+            {
+            qDebug() << "Р Р°РєРµС‚Р° СЃР±РёС‚Р°!";
+            currentRocket->count--;
+            result++;
+            } else qDebug() << "РџСЂРѕРјР°С…!";
             countOfMissle--;
             used++;
-        }
-        else
-        {
-            nukesToUs.pop_front();
-        }
-
-        if (nukesToUs.size() == 0 ) {result = 1;}
     }
 
+
+    int toUs2 = 0;
+    for (int i = 0; i < nukesInAir->size(); i++)
+        if ( nukesInAir->at(i).to == its.getNumber() && nukesInAir->at(i).count > 0 )
+        {
+            toUs2++;
+        }
+    qDebug() << "РўРµРїРµСЂСЊ РЅР° РЅР°СЃ Р»РµС‚РёС‚ " + QString::number(toUs2);
+
     this->setMissleDefence(this->getMissleDefence() - used);
-    if (result && used) {this->lvl+=1;}
-    return result;
+    if (toUs1 > 0 && toUs2 == 0) { this->lvl += 1; }
+    its.outCodes += "3001 " + QString::number(result) + " ";
+    return used;
 }
 
 void Defence::getInformation(Government &its)
@@ -137,19 +180,19 @@ void Defence::getInformation(Government &its)
 
 int Defence::stopNuclear(Government &its, Government &attack)
 {
-	Defence *attacked = (Defence*)(attack.ministers[2]);
-    for (int i = 0;i < attacked->nukesToUs.size();i++)
+    this->nukesInAir = its.nukesInAir;
+    for (int i = 0 ;i < nukesInAir->size(); i++)
     {
-        if (attacked->nukesToUs[i].from == its.getNumber())
+        if ( nukesInAir->at(i).from == its.getNumber() && nukesInAir->at(i).to == attack.getNumber())
         {
-           attacked->nukesToUs[i].count = 0;
+           nukesInAir->at(i).count = 0;
            break;
         }
     }
     return 1;
 }
 
-//нуждается в доработке
+//РЅСѓР¶РґР°РµС‚СЃСЏ РІ РґРѕСЂР°Р±РѕС‚РєРµ
 int Defence::marinesAttack(Government &its, Government &attack)
 {
     int result = 0;
@@ -160,7 +203,7 @@ int Defence::marinesAttack(Government &its, Government &attack)
 		Defence *attacked = (Defence*)(attack.ministers[2]);
 		nuclear += attacked->getNuclear();
 		missileDefense += attacked->getMissleDefence();
-        attack.outCodes += QString::number(500 + its.getNumber() ) + " ";
+        attack.outCodes += QString::number(500)  + QString::number(its.getNumber() ) + " ";
 	}
     return result;
 }
@@ -193,40 +236,41 @@ int Defence::raid(Government &its, Government &attack)
 
 void Defence::checkNukes(Government &its)
 {
-    for (int i = 0; i<nukesToUs.size();i++)
+    this->nukesInAir = its.nukesInAir;
+    for (int i = 0; i<nukesInAir->size();i++)
     {
-        nukesToUs[i].lifetime--;
+        if (nukesInAir->at(i).to == its.getNumber())
+        nukesInAir->at(i).lifetime--;
     }
 
-    while (nukesToUs.size() > 0)
+    while (nukesInAir->size() > 0)
     {
-        if(nukesToUs[0].count <= 0)
+        if(nukesInAir->at(0).count <= 0)
         {
-            nukesToUs.pop_front();
+            nukesInAir->pop_front();
         }
         else
             break;
     }
 
-    while (nukesToUs.size() > 0)
+    for (int i = 0; i<nukesInAir->size();i++)
     {
-        if (nukesToUs[0].lifetime <= 0)
+        if (nukesInAir->at(i).lifetime <= 0 && nukesInAir->at(i).to == its.getNumber())
         {
-            explodeNuke(its,nukesToUs[0]);
-            nukesToUs.pop_front();
+            explodeNuke(its,nukesInAir->at(i));
+            nukesInAir->at(i).count = 0;
         }
-        else
-            break;
     }
 }
 
-void Defence::explodeNuke(Government &its, NukeInAir rocket)
+void Defence::explodeNuke(Government &its, NukeRocket rocket)
 {
     governments->getPtrToGov(rocket.from)->ministers[2]->increaseLvl(*governments->getPtrToGov(rocket.from));
     for (int i = 0; i<rocket.count; i++)
     {
     its.setHappiness(its.getHappiness() / 2);
     its.setMoney(its.getMoney() / 2);
+    // toDo
     }
 
     its.outCodes +="300 ";

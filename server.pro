@@ -50,7 +50,8 @@ HEADERS  += mainwindow.h \
     Anton_CPU/President.h \
     CPU/maincpu.h \
     listofgovernments.h \
-    CPU/rialto.h
+    CPU/rialto.h \
+    CPU/nukesinair.h
 
 
 

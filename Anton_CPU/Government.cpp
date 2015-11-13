@@ -24,8 +24,9 @@ void Government::setNumber(int newNumber) { number = newNumber; }
 void Government::setCountOfTeam(int newCountOfTeam) { countOfTeam = newCountOfTeam; }
 void Government::setHappiness(short int newHappiness) { happiness = newHappiness; }
 
-Government::Government(int itsNumber, int itsCountOfTeam, ListOfGovernments *govs, Rialto *rialto)
+Government::Government(int itsNumber, int itsCountOfTeam, ListOfGovernments *govs, Rialto *rialto, deque<NukeRocket> *nukesInAir)
 {
+    this->nukesInAir = nukesInAir;
     this->rialto = rialto;
     governments = govs;
 	number = itsNumber;
@@ -331,9 +332,8 @@ int Government::doMinHelCommand(Command com)
 
 void Government::prepare()
 {
-        outCodes = "";
         Defence *def = (Defence*)(this->ministers[2]);
-        def->checkNukes(*this);
+        outCodes = "";
 
         for (int i = 0; i<COUNT_OF_MINISTER; i++)
         {
@@ -351,7 +351,7 @@ void Government::prepare()
          {
              for (int j = 0; j<10;j++)
              {
-                 if (isVerbed(i,j)) {budget -= 50000;}
+                 if ( isVerbed(i,j) ) {budget -= 50000;}
              }
          }
 
@@ -359,12 +359,24 @@ void Government::prepare()
 
         this->setMoney(getMoney() + budget);
 
-        if (this->happiness <=10)
+        if (this->happiness <=25)
         {
             this->isInRebellion = true;
             this->outCodes += "202 ";
         }
 
+}
+
+void Government::postPrepare()
+{
+    Defence *def = (Defence*)(this->ministers[2]);
+    def->checkNukes(*this);
+
+    if (this->happiness <=25)
+    {
+        this->isInRebellion = true;
+        this->outCodes += "202 ";
+    }
 }
 
 int Government::getNukes()
