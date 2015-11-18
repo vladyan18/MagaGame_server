@@ -3,7 +3,8 @@
 class MVD : public Minister
 {
 public:
-	MVD();
+    MVD();
+    MVD(Government *its);
 	//подавить восстание
     int suppressRebellion(Government &its);
 	//проверить, есть ли в вашем государстве завербованные министры

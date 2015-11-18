@@ -1,13 +1,15 @@
 #include "Government.h"
 #include "President.h"
 #include <fstream>
+#include <cmath>
 
 using namespace std;
 
 int President::dismiss(Government &its, int numOfMinister)
 { 
     int numOfAttacker;
-	its.ministers[numOfMinister]->setLvl(its.ministers[numOfMinister]->getLvl() / 2);
+    its.ministers[numOfMinister]->setLvl(ceil(its.ministers[numOfMinister]->getLvl() / 2));
+    its.ministers[numOfMinister]->status = 2;
     numOfAttacker = its.ministers[numOfMinister]->getWhooseRecruit();
     if (numOfAttacker != -1 )
     {
@@ -19,18 +21,17 @@ int President::dismiss(Government &its, int numOfMinister)
         fr.args[3] = numOfMinister+1;
         attacker->doMIDCommand(fr);
     }
+    return 1;
 }
 
 void President::getInformation()
 {
-	ofstream fout("Civ.out", ios_base::app);
-	fout << "У президента " << lvl << " lvl" << endl;
-	fout.close();
 }
 
-President::President(ListOfGovernments *govs)
+President::President(Government *its, ListOfGovernments *govs)
 {
+    this->helpKoeff = 2;
+    this->its = its;
     this->governments = govs;
     lvl = 1;
-    this->helpLvl = 1;
 }

@@ -6,19 +6,20 @@ using namespace std;
 
 bool TSOP(double attackLvl, double defenceLvl);
 
-CommunicationMinister::CommunicationMinister(int countOfTeam, ListOfGovernments *govs)
+CommunicationMinister::CommunicationMinister(Government *its, int countOfTeam, ListOfGovernments *govs)
 {
+    this->its = its;
     this->governments = govs;
     this->countOfTeam = countOfTeam;
-    itsSlander = new bool[countOfTeam+1];
+    itsSlander = new bool[countOfTeam];
 	for (int i = 0;i < countOfTeam;i++)
 		itsSlander[i] = false;
 }
 
-void CommunicationMinister::setItsSlander(bool newItsSlander, int numOfTeam) { itsSlander[numOfTeam] = newItsSlander; }
+void CommunicationMinister::setItsSlander(bool newItsSlander, int numOfTeam) { itsSlander[numOfTeam-1] = newItsSlander; }
 //void CommunicationMinister::setItsRebellion(int newItsRebellion) { itsRebellion = newItsRebellion; }
 
-bool CommunicationMinister::getItsSlander(int numOfTeam) { return itsSlander[numOfTeam]; }
+bool CommunicationMinister::getItsSlander(int numOfTeam) { return itsSlander[numOfTeam-1]; }
 //int CommunicationMinister::getItsRebellion() { return itsRebellion; }
 
 int CommunicationMinister::accuse(Government &its, Government &attack)
@@ -26,7 +27,7 @@ int CommunicationMinister::accuse(Government &its, Government &attack)
 	if (its.getMoney() >= COST_OF_ACCUSE)
 	{
 		its.setMoney(its.getMoney() - COST_OF_ACCUSE);
-		if (TSOP(getTSOPlvl(), attack.ministers[7]->getTSOPlvl()))
+        if (TSOP(getLvl(), attack.ministers[7]->getTSOPlvl(8)))
 		{
 			CommunicationMinister *attackCommunicationMinister = (CommunicationMinister*)(its.ministers[7]);
 			attackCommunicationMinister->setItsSlander(true, its.getNumber());
@@ -48,20 +49,20 @@ int CommunicationMinister::accuse(Government &its, Government &attack)
 int CommunicationMinister::disslander(Government &its)
 {
     Government *attack;
-    for (int i = 1; i<=countOfTeam; i++)
+    for (int i = 0; i<its.getCountOfTeam(); i++)
     {
         if (itsSlander[i])
         {
-            attack = governments->getPtrToGov(i);
+            attack = governments->getPtrToGov(i+1);
 
             if (its.getMoney() >= COST_OF_DISSLANDER)
             {
                 its.setMoney(its.getMoney() - COST_OF_DISSLANDER);
-                if ((TSOP(getTSOPlvl(), attack->ministers[7]->getTSOPlvl())) &&
+                if ((TSOP(getOurTSOPLvl(8), attack->ministers[7]->getTSOPlvl(8))) &&
                     (getItsSlander(attack->getNumber())))
                 {
                     lvl++;
-                    itsSlander[attack->getNumber()] = false;
+                    itsSlander[attack->getNumber()-1] = false;
                     its.setHappiness(its.getHappiness() + DECREASE_HAPPINESS_BY_SLANDER);
                     attack->setHappiness(attack->getHappiness() - DECREASE_HAPPINESS_BY_SLANDER);
                     attack->outCodes += "201 ";
@@ -86,10 +87,10 @@ int CommunicationMinister::increaseHappiness(Government &its, int countOfUp)
 {
     int result = 0;
     for (int i = 0;i < countOfUp;i++)
-		if (its.getMoney() >= COMMUNICATION_MINISTER_INCREASE_HAPPINESS)
+        if (its.getMoney() >= 50000)
 		{
-			its.setMoney(its.getMoney() - COMMUNICATION_MINISTER_INCREASE_HAPPINESS);
-			its.setHappiness(its.getHappiness() + COMMUNICATION_MINISTER_INCREASE_HAPPINESS);
+            its.setMoney(its.getMoney() - 50000);
+            its.setHappiness(its.getHappiness() + 1);
             result++;
         }
     return result;
@@ -98,14 +99,14 @@ int CommunicationMinister::increaseHappiness(Government &its, int countOfUp)
 int CommunicationMinister::fireRebellion(Government &its, Government &attack, int countOfFire)
 {
     int result = 0;
-	for (int i = 0;i < countOfFire;i++)
+
 		if (its.getMoney() >= COST_OF_FIRE_REBELLION)
 		{
 			its.setMoney(its.getMoney() - COST_OF_FIRE_REBELLION);
-			if (TSOP(getTSOPlvl(), attack.ministers[7]->getTSOPlvl() + attack.ministers[6]->getTSOPlvl()))
+            if (TSOP(getOurTSOPLvl(8), attack.ministers[7]->getTSOPlvl(8) + attack.ministers[6]->getTSOPlvl(7)))
 			{
 				lvl++;
-				attack.setHappiness(attack.getHappiness() + DECREASE_HAPPINESS_BY_REBELLION);
+                attack.setHappiness(attack.getHappiness() - 10);
                 result++;
             }
 		}
@@ -114,10 +115,19 @@ int CommunicationMinister::fireRebellion(Government &its, Government &attack, in
 
 void CommunicationMinister::getInformation(int countOfTeam)
 {
-	ofstream fout("Civ.out", ios_base::app);
-	fout << "У министра по связям с общественностью " << lvl << " lvl" << endl;
-	for (int i = 0;i < countOfTeam;i++)
-		if (itsSlander[i])
-			fout << "Государство №" << i + 1 << " оклеветало вас" << endl;
-	fout.close();
+}
+
+void CommunicationMinister::updateSlander()
+{
+    bool *newSlander = new bool[its->getCountOfTeam()];
+
+    for (int i = 0; i < its->getCountOfTeam(); i++)
+    {
+        if (i < its->getCountOfTeam() - 1)
+        newSlander[i] = itsSlander[i];
+        else
+        newSlander[i] = 0;
+    }
+
+    itsSlander = newSlander;
 }

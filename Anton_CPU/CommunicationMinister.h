@@ -5,12 +5,13 @@ class CommunicationMinister : public Minister
 {
 public:
 	CommunicationMinister() {}
-    CommunicationMinister(int countOfTeam, ListOfGovernments *gov);
+    CommunicationMinister(Government *its,int countOfTeam, ListOfGovernments *gov);
 	void setItsSlander(bool newItsSlander, int numOfTeam);
 	//void setItsRebellion(int newItsRebellion);
 
 	bool getItsSlander(int numOfTeam);
 	//int getItsRebellion();
+    void updateSlander();
 
 	//сделать за€влени€ в международные —ћ»
     int accuse(Government &its, Government &attack);
@@ -22,8 +23,9 @@ public:
     int fireRebellion(Government &its, Government &attack, int countOfFire);
 	// получить информацию о министрепо св€з€м с общественностью
 	void getInformation(int countOfTeam);
+    bool *itsSlander;
 private:
-	bool *itsSlander;		//номер государтсва, кинувшего ложь (-1, если отсутствует)
+        //номер государтсва, кинувшего ложь (-1, если отсутствует)
     int countOfTeam;
     ListOfGovernments *governments;
 	//int itsRebellion;	//номер государтсва, кинувшего вирус (-1, если отсутствует)

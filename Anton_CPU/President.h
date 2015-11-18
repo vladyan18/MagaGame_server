@@ -8,7 +8,7 @@ public:
     int dismiss(Government &its, int numOfMinister);
 	// получить информацию о президенте
 	void getInformation();
-    President(ListOfGovernments *govs);
+    President(Government *its,ListOfGovernments *govs);
 
 private:
     ListOfGovernments *governments;

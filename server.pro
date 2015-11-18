@@ -30,7 +30,9 @@ SOURCES += main.cpp\
     Anton_CPU/TSOP.cpp \
     CPU/maincpu.cpp \
     listofgovernments.cpp \
-    CPU/rialto.cpp
+    CPU/rialto.cpp \
+    whataboutproofdial.cpp \
+    Anton_CPU/secretary.cpp
 
 
 
@@ -51,9 +53,12 @@ HEADERS  += mainwindow.h \
     CPU/maincpu.h \
     listofgovernments.h \
     CPU/rialto.h \
-    CPU/nukesinair.h
+    CPU/nukesinair.h \
+    whataboutproofdial.h \
+    Anton_CPU/secretary.h
 
 
 
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    whataboutproofdial.ui

@@ -4,7 +4,7 @@ class ForeignMinister : public Minister
 {
 public:
 	ForeignMinister();
-	ForeignMinister(int countOfTeam);
+    ForeignMinister(Government *its,int countOfTeam);
 	//диверсия
     int sabotage(Government &its, Government &attack, int numOfMinister);
 	//завербовать министра
@@ -21,7 +21,7 @@ public:
 	void getInformation(int countOfTeam);
     bool **verbedList;
     void updateVerbedList(int countOfTeam);
-
+    int trackingTarget[2] = {0,0};
 private:
     int countOfTeam;
 };

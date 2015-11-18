@@ -29,6 +29,8 @@ public:
 	int getCountOfTeam();
     int getNukes();
     int getMissles();
+    void setNukes(int newNukes);
+    void setPRO(int newPRO);
 	short int getHappiness();
 
     void changeMoney (double difference);
@@ -54,12 +56,17 @@ public:
     int doMVDCommand(Command);
     int doMinComCommand(Command);
     int doMinHelCommand(Command);
+    int doSecretaryCommand(Command);
     QString outCodes;
     bool isInRebellion = false;
     long getHeavyIndustrial();
     long getLightIndustrial();
     long getAgricultural();
+    void setHeavyIndustrial(long);
+    void  setLightIndustrial(long);
+    void setAgricultural(long);
     Rialto *rialto;
+    double **internationalHelp;
     deque<NukeRocket> *nukesInAir;
 private:
 	double money;								//казна

@@ -1,16 +1,18 @@
 #include <ctime>
 #include "stdlib.h"
 #include <cmath>
+#include <QDebug>
 using namespace std;
 
-bool TSOP(double attackLvl, double defenceLvl) // вычисление победителя 
+bool TSOP(double attackLvl, double defenceLvl)
 {
     double dLvl = attackLvl - defenceLvl; // delta lvl
+    qDebug() << "РџСЂРѕРёР·РѕС€Р»Рѕ РІС‹С‡РёСЃР»РµРЅРёРµ РїРѕ РўРЎРћРџ. 1:" + QString::number(attackLvl) +" , 2:" + QString::number(defenceLvl);
 
     if (dLvl >= 0)
 	{
         double chanceToWin = 0.5;
-        for (int i = 2; i <= dLvl+1; i++) //вычисляет шанс на победу атакующего
+        for (int i = 2; i <= dLvl+1; i++) //РІС‹С‡РёСЃР»СЏРµС‚ С€Р°РЅСЃ РЅР° РїРѕР±РµРґСѓ Р°С‚Р°РєСѓСЋС‰РµРіРѕ
 		{
             chanceToWin += pow(0.5,i);
 		}

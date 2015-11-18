@@ -85,7 +85,7 @@ void MainCPU::checkForMID(Command *commands)
         {
             qDebug() << "Попытка саботажа.";
             teams[i].government->changeMoney(-COST_OF_SABOTAGE);
-        if (TSOP(teams[i].government->ministers[4]->getTSOPlvl() , teams[commands[i].args[2]-1].government->ministers[commands[i].args[3]-1]->getTSOPlvl() ))
+        if (TSOP(teams[i].government->ministers[4]->getOurTSOPLvl(5) , teams[commands[i].args[2]-1].government->ministers[commands[i].args[3]-1]->getTSOPlvl(commands[i].args[3]) ))
             {
             qDebug() << "ТСОП - победа!";
 

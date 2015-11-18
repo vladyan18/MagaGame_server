@@ -14,7 +14,7 @@ struct NukeInAir
 class Defence : public Minister
 {
 public:
-    Defence(int countOfTeam, ListOfGovernments*);
+    Defence(Government *its,int countOfTeam, ListOfGovernments*);
 	Defence();
     deque <NukeInAir> nukesToUs;
 	int getNuclear();
@@ -35,7 +35,7 @@ public:
     int DecreaseCountOfMissleDefence(Government &its, int countOfMissle);
 
 	//запуск ядерной ракеты
-    int NuclearStrike(Government &its, Government &attack, int countOfNuclear);
+    int NuclearStrike(Government &its, Government &attack,int countOfNuclear);
 	//сбить ядерную ракету
     int shootDownNucler(Government &its, int countOfMissle);
 	//отменить ядерный удар
@@ -44,11 +44,12 @@ public:
     int marinesAttack(Government &its, Government &attack);
 	//набег на государство 
     int raid(Government &its, Government &attack);
-	//получить информацию об этом министре
+
+    int giveNukes(Government &its, Government &attack, int count);
+    int givePRO(Government &its, Government &attack, int count);
 	void getInformation(Government &its);
 private:
 	int nuclear;
 	int missileDefense;
-
     int countOfTeams;
 };

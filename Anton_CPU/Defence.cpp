@@ -15,8 +15,9 @@ void Defence::setMissleDefence(int newMissleDefence) { missileDefense = newMissl
 
 Defence::Defence() {}
 
-Defence::Defence(int countOfTeam, ListOfGovernments *governments)
+Defence::Defence(Government *its,int countOfTeam, ListOfGovernments *governments)
 {
+    this->its = its;
     this->governments = governments;
     this->countOfTeams = countOfTeam;
 	nuclear = 0;
@@ -117,43 +118,50 @@ int Defence::shootDownNucler(Government &its, int countOfMissle)
     int result = 0, used = 0;
 
     int toUs1 = 0;
+    int toUs3;
     for (int i = 0; i < nukesInAir->size(); i++)
         if ( nukesInAir->at(i).to == its.getNumber() && nukesInAir->at(i).count > 0 )
         {
             toUs1++;
         }
+    toUs3 = toUs1;
             qDebug() << "На нас летит " + QString::number(toUs1);
     while (nukesInAir->size() > 0 && countOfMissle > 0)
     {
         currentRocket = NULL;
 
-        for (int i = 0; i < nukesInAir->size(); i++)
-            if (nukesInAir->at(i).count > 0)
-            {
-              qDebug() << "В небе ракета!";
-              currentRocket = &(nukesInAir->at(i));
-              break;
-            }
-
-
-        if (currentRocket == NULL) {break;} //------------------------------------
-
-        if (toUs1 > 0)
+        if (toUs3 == 0)
         {
-        for (int i = 0; i < nukesInAir->size(); i++)
-            if ( nukesInAir->at(i).to == its.getNumber() && nukesInAir->at(i).count > 0 )
+            for (int i = 0; i < nukesInAir->size(); i++)
+                if (nukesInAir->at(i).count > 0 && nukesInAir->at(i).from != its.getNumber())
+                {
+                    qDebug() << "В небе ракета!";
+                    currentRocket = &(nukesInAir->at(i));
+                    break;
+                }
+        }
+        else
+        {
+            if (toUs3 > 0)
             {
-                currentRocket = &(nukesInAir->at(i));
-                break;
+                for (int i = 0; i < nukesInAir->size(); i++)
+                    if ( nukesInAir->at(i).to == its.getNumber() && nukesInAir->at(i).count > 0 )
+                    {
+                        currentRocket = &(nukesInAir->at(i));
+                        break;
+                    }
             }
         }
 
+        if (currentRocket == NULL) {break;}
 
-            if (TSOP(its.ministers[2]->getTSOPlvl(), governments->getPtrToGov(currentRocket->from)->ministers[2]->getTSOPlvl()) )
+
+            if (TSOP(its.ministers[2]->getTSOPlvl(3), governments->getPtrToGov(currentRocket->from)->ministers[2]->getTSOPlvl(3)) )
             {
             qDebug() << "Ракета сбита!";
             currentRocket->count--;
             result++;
+            if (toUs3 > 0) {toUs3--;}
             } else qDebug() << "Промах!";
             countOfMissle--;
             used++;
@@ -196,7 +204,7 @@ int Defence::stopNuclear(Government &its, Government &attack)
 int Defence::marinesAttack(Government &its, Government &attack)
 {
     int result = 0;
-	if (TSOP(getTSOPlvl(), attack.ministers[0]->getTSOPlvl() + attack.ministers[2]->getTSOPlvl()))
+    if (TSOP(getTSOPlvl(3), attack.ministers[0]->getTSOPlvl(1) + attack.ministers[2]->getTSOPlvl(3)))
 	{
         result = 1;
 		its.setMoney(its.getMoney() + attack.getMoney());
@@ -214,7 +222,7 @@ int Defence::raid(Government &its, Government &attack)
 	if (its.getMoney() > COST_OF_RAID)
 	{
 		its.setMoney(its.getMoney() - COST_OF_RAID);
-		if (TSOP(getTSOPlvl(), attack.ministers[0]->getTSOPlvl()))
+        if (TSOP(getLvl(), attack.ministers[2]->getTSOPlvl(3)))
 		{
 			lvl++;
             result = 1;
@@ -274,4 +282,29 @@ void Defence::explodeNuke(Government &its, NukeRocket rocket)
     }
 
     its.outCodes +="300 ";
+}
+
+int Defence::giveNukes(Government &its, Government &attack, int count)
+{
+    if (its.getNukes() >= count)
+    {
+        its.setNukes(its.getNukes() - count);
+        attack.setNukes(attack.getNukes() + count);
+        attack.outCodes+= "210 " + QString::number(its.getNumber()) + " " + QString::number(count);
+        return 1;
+    }
+    return 0;
+
+}
+
+int Defence::givePRO(Government &its, Government &attack, int count)
+{
+    if (its.getMissles() >= count)
+    {
+        its.setPRO(its.getMissles() - count);
+        attack.setPRO(attack.getMissles() + count);
+        attack.outCodes+= "211 " + QString::number(its.getNumber()) + " " + QString::number(count);
+        return 1;
+    }
+    return 0;
 }

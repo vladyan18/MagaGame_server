@@ -7,14 +7,15 @@ class Government;
 class Minister
 {
 public:
-	Minister();
+    Minister();
 	virtual void getInformation() {}
 	virtual ~Minister() {}
 	double getLvl();
 	double getHelpLvl();
 	double getRecruitLvl();
 	int getWhooseRecruit();
-	double getTSOPlvl();
+    double getTSOPlvl(int numOfMinister);
+    double getOurTSOPLvl(int numOfMinister);
 	
 	void setLvl(double newLvl);
 	void setHelpLvl(double newHelpLvl);
@@ -25,9 +26,13 @@ public:
     int increaseLvl(Government &its);
 	//помочь другому министру
     int help(Government &its, Government &getsHelp, int helpNumberOfMinister);
+    Government *its;
+    int status = 0;
 protected:
 		double lvl;
 		double helpLvl;					//дополнительный уровень помощи
 		double recruitLvl;				//дополнительный уровень при вербоке
 		int whooseRecruit;
+        int helpKoeff = 1;
+
 };

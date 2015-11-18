@@ -8,6 +8,7 @@
 #include "MVD.h"
 #include "CommunicationMinister.h"
 #include "HealthMinister.h"
+#include "secretary.h"
 #include <fstream>
 #include <listofgovernments.h>
 
@@ -34,16 +35,28 @@ Government::Government(int itsNumber, int itsCountOfTeam, ListOfGovernments *gov
 	money = START_MONEY;
 	happiness = MAX_HAPPINESS;
     outCodes = "215 ";
-    ministers[0] = new President(governments);
-	ministers[1] = new Finance();
-    ministers[2] = new Defence(countOfTeam, governments);
-	ministers[3] = new MinisterFSB();
-	ministers[4] = new ForeignMinister(countOfTeam);
-	ministers[5] = new MinisterOfJustice();
-	ministers[6] = new MVD();
-    ministers[7] = new CommunicationMinister(countOfTeam, governments);
-	ministers[8] = new HealthMinister(countOfTeam);
-    ministers[9] = new Minister;
+    ministers[0] = new President(this,governments);
+    ministers[1] = new Finance(this);
+    ministers[2] = new Defence(this,countOfTeam, governments);
+    ministers[3] = new MinisterFSB(this);
+    ministers[4] = new ForeignMinister(this,countOfTeam);
+    ministers[5] = new MinisterOfJustice(this);
+    ministers[6] = new MVD(this);
+    ministers[7] = new CommunicationMinister(this,countOfTeam, governments);
+    ministers[8] = new HealthMinister(this,countOfTeam);
+    ministers[9] = new secretary(this);
+
+    internationalHelp = new double*[10];
+    for (int i = 0; i < 10; i++)
+    {
+        internationalHelp[i] = new double[countOfTeam];
+        for (int j = 0; j < countOfTeam; j++)
+        {
+            internationalHelp[i][j] = 0;
+        }
+    }
+
+
 }
 
 Government::~Government()
@@ -56,8 +69,6 @@ Government::~Government()
 
 Government::Government(const Government &rhs)
 {
-	for (int i = 0;i < COUNT_OF_MINISTER;i++)
-		*ministers[i] = *(rhs.ministers[i]);
 }
 
 Government::Government() {}
@@ -79,31 +90,54 @@ int Government::doCommand(Command com)
     switch(com.args[0])
     {
     case 1:
+        if (ministers[0]->status == 0)
         return doPresidentCommand(com);
+        else return 0;
         break;
     case 2:
+        if (ministers[1]->status == 0)
         return doMinFinCommand(com);
+        else return 0;
         break;
     case 3:
+        if (ministers[2]->status == 0)
         return doMinDefCommand(com);
+        else return 0;
         break;
     case 4:
+        if (ministers[3]->status == 0)
         return doKGBCommand(com);
+        else return 0;
         break;
     case 5:
+        if (ministers[4]->status == 0)
         return doMIDCommand(com);
+        else return 0;
         break;
     case 6:
+        if (ministers[5]->status == 0)
         return doMinUstCommand(com);
+        else return 0;
         break;
     case 7:
+        if (ministers[6]->status == 0)
         return doMVDCommand(com);
+        else return 0;
         break;
     case 8:
+        if (ministers[7]->status == 0)
         return doMinComCommand(com);
+        else return 0;
         break;
     case 9:
+        if (ministers[8]->status == 0)
         return doMinHelCommand(com);
+        else return 0;
+        break;
+    case 10:
+        if (ministers[9]->status == 0)
+        return doSecretaryCommand(com);
+        else return 0;
         break;
     }
     return 0;
@@ -115,7 +149,7 @@ int Government::doPresidentCommand(Command com)
    switch (com.args[1])
    {
    case -2: // оказать помощь
-       return pres->help(*this, *this, com.args[2]-1);
+       return pres->help(*this, *governments->getPtrToGov(com.args[3]), com.args[2]-1);
        break;
    case 0:  // повысить уровень
        return pres->increaseLvl(*this);
@@ -133,7 +167,7 @@ int Government::doMinFinCommand(Command com)
     switch(com.args[1])
     {
     case -2:
-        return fin->help(*this, *this, com.args[2]-1);
+        return fin->help(*this, *governments->getPtrToGov(com.args[3]), com.args[2]-1);
         break;
     case 0:
         return fin->increaseLvl(*this);
@@ -147,6 +181,9 @@ int Government::doMinFinCommand(Command com)
     case 3:
         return fin->doTrans(*this, *governments->getPtrToGov(com.args[2]), com.args[3]);
         break;
+    case 4:
+        return fin->giveFac(*this, *governments->getPtrToGov(com.args[2]), com.args[3], com.args[4]);
+        break;
     }
     return 0;
 }
@@ -157,7 +194,7 @@ int Government::doMinDefCommand(Command com)
     switch(com.args[1])
     {
     case -2:
-        return def->help(*this,*this, com.args[2]-1);
+        return def->help(*this,*governments->getPtrToGov(com.args[3]), com.args[2]-1);
         break;
     case 0:
         return def->increaseLvl(*this);
@@ -185,6 +222,12 @@ int Government::doMinDefCommand(Command com)
     case 7:
         return def->raid(*this, *governments->getPtrToGov(com.args[2]));
         break;
+    case 8:
+        return def->giveNukes(*this,*governments->getPtrToGov(com.args[2]), com.args[3]);
+        break;
+    case 9:
+        return def->givePRO(*this,*governments->getPtrToGov(com.args[2]), com.args[3]);
+        break;
     }
     return 0;
 }
@@ -195,7 +238,7 @@ int Government::doKGBCommand(Command com)
     switch(com.args[1])
     {
     case -2:
-        return kgb->help(*this,*this,com.args[2]-1);
+        return kgb->help(*this,*governments->getPtrToGov(com.args[3]),com.args[2]-1);
         break;
     case 0:
         return kgb->increaseLvl(*this);
@@ -216,7 +259,7 @@ int Government::doMIDCommand(Command com)
     switch(com.args[1])
     {
     case -2:
-        return mid->help(*this, *this, com.args[2]-1);
+        return mid->help(*this, *governments->getPtrToGov(com.args[3]), com.args[2]-1);
         break;
     case 0:
         return mid->increaseLvl(*this);
@@ -227,8 +270,7 @@ int Government::doMIDCommand(Command com)
     case 3:
         return mid->reverb(*this, *governments->getPtrToGov(com.args[2]), com.args[3]-1);
         break;
-    case 5:
-        if (isVerbed(com.args[2]-1, com.args[3]-1)   )
+    case 5:        
         return mid->kill(*this, *governments->getPtrToGov(com.args[2]), com.args[3]-1);
         break;
     case 6:
@@ -244,7 +286,7 @@ int Government::doMinUstCommand(Command com)
     switch(com.args[1])
     {
     case -2:
-        return minust->help(*this, *this, com.args[2]-1);
+        return minust->help(*this, *governments->getPtrToGov(com.args[3]), com.args[2]-1);
         break;
     case 0:
         return minust->increaseLvl(*this);
@@ -263,7 +305,7 @@ int Government::doMVDCommand(Command com)
     switch (com.args[1])
     {
     case -2:
-        return mvd->help(*this, *this, com.args[2]-1);
+        return mvd->help(*this, *governments->getPtrToGov(com.args[3]), com.args[2]-1);
         break;
     case 0:
         return mvd->increaseLvl(*this);
@@ -289,7 +331,7 @@ int Government::doMinComCommand(Command com)
     switch(com.args[1])
     {
     case -2:
-        return mincom->help(*this, *this, com.args[2]-1);
+        return mincom->help(*this, *governments->getPtrToGov(com.args[3]), com.args[2]-1);
         break;
     case 0:
         return mincom->increaseLvl(*this);
@@ -315,7 +357,7 @@ int Government::doMinHelCommand(Command com)
     switch(com.args[1])
     {
     case -2:
-        return minhel->help(*this, *this, com.args[2]-1);
+        return minhel->help(*this, *governments->getPtrToGov(com.args[3]), com.args[2]-1);
         break;
     case 0:
         return minhel->increaseLvl(*this);
@@ -330,15 +372,38 @@ int Government::doMinHelCommand(Command com)
     return 0;
 }
 
+int Government::doSecretaryCommand(Command com)
+{
+    secretary *sec = (secretary*)(this->ministers[8]);
+    switch(com.args[1])
+    {
+    case -2:
+        return sec->help(*this, *governments->getPtrToGov(com.args[3]), com.args[2]-1);
+        break;
+    case 0:
+        return sec->increaseLvl(*this);
+        break;
+    }
+    return 0;
+}
+
 void Government::prepare()
 {
+
+        CommunicationMinister *com = (CommunicationMinister*)(this->ministers[7]);
+        for (int i = 0; i < countOfTeam; i++)
+        {
+            if (com->itsSlander[i]) {this->setHappiness(this->getHappiness() - 10);}
+        }
+
         Defence *def = (Defence*)(this->ministers[2]);
         outCodes = "";
 
         for (int i = 0; i<COUNT_OF_MINISTER; i++)
         {
             ministers[i]->setHelpLvl(0);
-            ministers[i]->setRecruitLvl(0);
+            if (ministers[i]->status != 0)
+            ministers[i]->status -= 1;
         }
 
         Finance *fin = (Finance*)(this->ministers[1]);
@@ -359,12 +424,25 @@ void Government::prepare()
 
         this->setMoney(getMoney() + budget);
 
-        if (this->happiness <=25)
+        HealthMinister *hel = (HealthMinister*)(this->ministers[8]);
+        hel->doHarmFromViruses();
+
+        for (int i = 0; i<10; i++)
         {
-            this->isInRebellion = true;
-            this->outCodes += "202 ";
+            for (int j = 0; j < countOfTeam; j++)
+            {
+                internationalHelp[i][j] = 0;
+            }
         }
 
+        MinisterFSB *kgb = (MinisterFSB*)(this->ministers[3]);
+        kgb->kgbPower = 100;
+        kgb->isDefending = false;
+
+        if(this->getHappiness() < 0)
+        {
+            this->setHappiness(0);
+        }
 }
 
 void Government::postPrepare()
@@ -372,10 +450,15 @@ void Government::postPrepare()
     Defence *def = (Defence*)(this->ministers[2]);
     def->checkNukes(*this);
 
-    if (this->happiness <=25)
+    if (this->happiness < 50)
     {
         this->isInRebellion = true;
         this->outCodes += "202 ";
+    }
+
+    if(this->getHappiness() < 0)
+    {
+        this->setHappiness(0);
     }
 }
 
@@ -390,6 +473,20 @@ int Government::getMissles()
          Defence *def = (Defence*)(this->ministers[2]);
          return def->getMissleDefence();
 }
+
+void Government::setNukes(int newNukes)
+{
+    Defence *def = (Defence*)(this->ministers[2]);
+    def->setNuclear(newNukes);
+}
+
+void Government::setPRO(int newPRO)
+{
+    Defence *def = (Defence*)(this->ministers[2]);
+    def->setMissleDefence(newPRO);
+}
+
+
 
 bool Government::isVerbed(int country, int min)
 {
@@ -415,9 +512,46 @@ long Government::getAgricultural()
      return fin->getAgriculture();
 }
 
+void Government:: setHeavyIndustrial(long newValue)
+{
+     Finance *fin = (Finance*)(ministers[1]);
+     fin->setHeavyIndustry(newValue);
+}
+
+void Government::setLightIndustrial(long newValue)
+{
+     Finance *fin = (Finance*)(ministers[1]);
+     fin->setLightIndustry(newValue);
+}
+
+void Government::setAgricultural(long newValue)
+{
+     Finance *fin = (Finance*)(ministers[1]);
+     fin->setAgriculture(newValue);
+}
+
 void Government::updateVerbedList(int countOfTeam)
 {
     this->countOfTeam = countOfTeam;
      ForeignMinister *mid = (ForeignMinister*)(ministers[4]);
      mid->updateVerbedList(countOfTeam);
+
+     ((CommunicationMinister*)(ministers[7]))->updateSlander();
+
+     double **newInternationalHelp;
+
+     newInternationalHelp = new double*[10];
+     for (int i = 0; i < 10; i++)
+     {
+         newInternationalHelp[i] = new double[countOfTeam];
+         for (int j = 0; j < countOfTeam; j++)
+         {
+             if (j < countOfTeam - 1)
+             newInternationalHelp[i][j] = internationalHelp[i][j];
+             else
+             newInternationalHelp[i][j] = 0;
+         }
+     }
+
+     internationalHelp = newInternationalHelp;
 }

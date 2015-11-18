@@ -6,28 +6,38 @@ using namespace std;
 
 bool TSOP(double attackLvl, double defenceLvl);
 
+MinisterFSB::MinisterFSB(Government *its)
+{
+    this->its = its;
+}
+
 int MinisterFSB::recruitDefence(Government &its, int numOfMinister, int countOfHelp)
 {
-    if (its.getMoney() >= COST_OF_RECRUIT_DEFENCE || isDefending)
+    if ((its.getMoney() >= COST_OF_RECRUIT_DEFENCE || isDefending) && countOfHelp <= kgbPower)
 	{
-        //lvl++;
+        if (!isDefending)
+        {
+            its.setMoney(its.getMoney() - COST_OF_RECRUIT_DEFENCE);
+        for (int i = 0; i<10; i++)
+            its.ministers[i]->setRecruitLvl(0);
+        }
+
         its.ministers[numOfMinister]->setRecruitLvl(its.ministers[3]->getLvl() * countOfHelp/100);
-        if (!isDefending){its.setMoney(its.getMoney() - COST_OF_RECRUIT_DEFENCE);}
+        kgbPower -= countOfHelp;
         isDefending = true;
+        return 1;
 	}
+    return 0;
 }
 
 void MinisterFSB::getInformation()
 {
-	ofstream fout("Civ.out", ios_base::app);
-	fout << "У директора ФСБ " << lvl << " lvl" << endl;
-	fout.close();
 }
 
 int MinisterFSB::findRecruited(Government &its, Government &searching)
 {
 	int countOfRecruited = 0;
-	int resultOfSearching[COUNT_OF_MINISTER];
+    int resultOfSearching[10];
 
 	if (its.getMoney() > COST_OF_FIND_RECRUTED)
 	{
@@ -35,13 +45,13 @@ int MinisterFSB::findRecruited(Government &its, Government &searching)
 		bool result = false;  //найден ли МИД в вашем государстве
 		int countOfRecruited = 0; //количество найденных рекрутов
 
-		for (int i = 0;i < COUNT_OF_MINISTER;i++) 
+        for (int i = 0;i < 10;i++)
 			resultOfSearching[i] = 0;
 
-		for (int i = 0;i < COUNT_OF_MINISTER;i++)
+        for (int i = 0;i < 10;i++)
 		{
-			if (TSOP(getTSOPlvl(), searching.ministers[4]->getTSOPlvl())) 
-				if (its.ministers[i]->getWhooseRecruit() == searching.getNumber()) // проверка всех министров на завербованность конкретного государтсва
+            if (its.ministers[i]->getWhooseRecruit() == searching.getNumber() && TSOP(getLvl(), searching.ministers[4]->getTSOPlvl(5)))
+                 // проверка всех министров на завербованность конкретного государтсва
 				{
 					result = true;
 					countOfRecruited++;
@@ -50,7 +60,14 @@ int MinisterFSB::findRecruited(Government &its, Government &searching)
 		}
 
 		if (result)
+        {
 			lvl++;
+            its.outCodes += "207 " + QString::number(searching.getNumber()) + " ";
+        }
+        else
+        {
+            its.outCodes +="216 ";
+        }
 	}
 	
 	int *answer = new int[countOfRecruited];
@@ -64,5 +81,5 @@ int MinisterFSB::findRecruited(Government &its, Government &searching)
 		}
 	}
 	
-    return *answer;
+    return 1;
 }
