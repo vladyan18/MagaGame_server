@@ -16,7 +16,8 @@ void MainCPU::addTeam(int numberOfTeam)
 
     for(int i = 0; i<teams.size()-1; i++)
     {
-        teams[i].government->updateVerbedList(teams.size() );
+        teams[i].government->updateVerbedList( teams.size() );
+        teams[i].updateReconList( teams.size() );
     }
 }
 
@@ -56,6 +57,8 @@ void MainCPU::processData()
                 temp.successful = result;
                 if (temp.args[0] != -1)
                 teams[j].listOfDidCommands.push_back(temp);
+                teams[j].listOfDidCommandsSize +=1;
+                qDebug() << "размер пула команд " << QString::number(teams[j].listOfDidCommands.size());
             }
         }
     }
@@ -64,8 +67,16 @@ void MainCPU::processData()
     rialto->processData();
     for (int i = 0; i<teams.size();i++)
     {
+        qDebug() << "размер пула команд в конце " << QString::number(teams[i].listOfDidCommands.size());
         teams[i].postPrepare();
+
         teams[i].writeData();
+        qDebug() << "размер пула команд в самом конце " << QString::number(teams[i].listOfDidCommands.size());
+    }
+
+    for (unsigned int j = 0; j<teams.size();j++)
+    {
+       // teams[j].listOfDidCommands.clear();
     }
 
 }
@@ -94,6 +105,7 @@ void MainCPU::checkForMID(Command *commands)
                     didIt = true;
                     if (commands[ commands[i].args[2]-1 ].args[0] != -1)
                     teams[commands[i].args[2]-1 ].listOfDidCommands.push_back(commands[ commands[i].args[2]-1 ]);
+                    teams[commands[i].args[2]-1 ].listOfDidCommandsSize +=1;
                     commands[ commands[i].args[2]-1 ].args[0] = -1;
                     commands[ commands[i].args[2]-1 ].args[1] = -1;
                     commands[ commands[i].args[2]-1 ].args[2] = -1;
@@ -118,6 +130,7 @@ void MainCPU::checkForMID(Command *commands)
         commands[i].args[4] = -1;
         commands[i].args[5] = -1;
         teams[i].listOfDidCommands.push_back(temp);
+        teams[i].listOfDidCommandsSize +=1;
         break;
         }
 
@@ -149,6 +162,7 @@ void MainCPU::checkForMID(Command *commands)
         commands[i].args[6] = -1;
 
         teams[i].listOfDidCommands.push_back(temp);
+        teams[i].listOfDidCommandsSize +=1;
         break;
         }
     }

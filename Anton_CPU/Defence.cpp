@@ -116,6 +116,7 @@ int Defence::shootDownNucler(Government &its, int countOfMissle)
     this->nukesInAir = its.nukesInAir;
     NukeRocket *currentRocket;
     int result = 0, used = 0;
+    int luck;
 
     int toUs1 = 0;
     int toUs3;
@@ -154,7 +155,6 @@ int Defence::shootDownNucler(Government &its, int countOfMissle)
         }
 
         if (currentRocket == NULL) {break;}
-
 
             if (TSOP(its.ministers[2]->getTSOPlvl(3), governments->getPtrToGov(currentRocket->from)->ministers[2]->getTSOPlvl(3)) )
             {
@@ -204,7 +204,10 @@ int Defence::stopNuclear(Government &its, Government &attack)
 int Defence::marinesAttack(Government &its, Government &attack)
 {
     int result = 0;
-    if (TSOP(getTSOPlvl(3), attack.ministers[0]->getTSOPlvl(1) + attack.ministers[2]->getTSOPlvl(3)))
+    this->numberOfEnemy = attack.getNumber();
+    int luck;
+    luck = TSOP(getTSOPlvl(3), attack.ministers[0]->getTSOPlvl(1) + attack.ministers[2]->getTSOPlvl(3));
+    if (luck)
 	{
         result = 1;
 		its.setMoney(its.getMoney() + attack.getMoney());
@@ -213,16 +216,20 @@ int Defence::marinesAttack(Government &its, Government &attack)
 		missileDefense += attacked->getMissleDefence();
         attack.outCodes += QString::number(500)  + QString::number(its.getNumber() ) + " ";
 	}
-    return result;
+    return luck;
 }
 
 int Defence::raid(Government &its, Government &attack)
 {
     int result = 0;
+    this->numberOfEnemy = attack.getNumber();
+    int luck;
+
 	if (its.getMoney() > COST_OF_RAID)
 	{
 		its.setMoney(its.getMoney() - COST_OF_RAID);
-        if (TSOP(getLvl(), attack.ministers[2]->getTSOPlvl(3)))
+        luck = TSOP(getLvl(), attack.ministers[2]->getTSOPlvl(3));
+        if (luck)
 		{
 			lvl++;
             result = 1;
@@ -239,7 +246,7 @@ int Defence::raid(Government &its, Government &attack)
 			}
 		}
 	}
-    return result;
+    return luck;
 }
 
 void Defence::checkNukes(Government &its)

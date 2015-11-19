@@ -32,38 +32,46 @@ HealthMinister::HealthMinister(Government *its, int countOfTeam)
 
 int HealthMinister::infectingVirus(Government &its, Government &attack)
 {
+    int luck = 0;
+    this->numberOfEnemy = attack.getNumber();
+
 	if (its.getMoney() >= COST_OF_INFECTING)
 	{
 		its.setMoney(its.getMoney() - COST_OF_INFECTING);
-        if (TSOP(getLvl(), attack.ministers[8]->getTSOPlvl(9)))
+        luck = TSOP(getLvl(), attack.ministers[8]->getTSOPlvl(9));
+        if (luck)
 		{
             HealthMinister *attackHealthMinister = (HealthMinister*)(attack.ministers[8]);
             attackHealthMinister->setVirus(true, its.getNumber());
             attack.outCodes += "208 ";
 			lvl++;
-            return 1;
+            return luck;
 		}
 	}
-    return 0;
+    return luck;
 }
 
 int HealthMinister::vaccine(Government &its, Government &attack)
 {
+    int luck = 0;
+    this->numberOfEnemy = attack.getNumber();
+
 	if (its.getMoney() >= COST_OF_VACCINE)
 	{
 		its.setMoney(its.getMoney() - COST_OF_VACCINE);
         if (virus[attack.getNumber() - 1])
         {
-            if (TSOP(getLvl(), attack.ministers[8]->getTSOPlvl(9)))
+            luck = TSOP(getLvl(), attack.ministers[8]->getTSOPlvl(9));
+            if (luck)
 			{
                 virus[attack.getNumber() - 1 ] = false;
                 stepOfVirus[attack.getNumber() - 1] = 1;
 				lvl++;
-                return 1;
+                return luck;
 			}
         } else {its.outCodes += "209 ";}
 	}
-    return 0;
+    return luck;
 }
 
 void HealthMinister::getInformation(int countOfTeam)

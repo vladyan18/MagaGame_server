@@ -10,9 +10,10 @@
 #include <QString>
 #include <CPU/rialto.h>
 #include <CPU/nukesinair.h>
+#include <vector>
 
 using namespace std;
-
+class Team;
 class Command;
 class Minister;
 class Government // pеализует государство 
@@ -22,7 +23,7 @@ public:
 	~Government();
 	Government();
 	Government(const Government &rhs);
-    Government(int itsNumber, int itsCountOfTeam, ListOfGovernments*, Rialto*, deque<NukeRocket>*);
+    Government(Team *team, int itsNumber, int itsCountOfTeam, ListOfGovernments*, Rialto*, deque<NukeRocket>*);
 
 	double getMoney();
 	int getNumber();
@@ -68,13 +69,12 @@ public:
     Rialto *rialto;
     double **internationalHelp;
     deque<NukeRocket> *nukesInAir;
+    Team *team;
+    ListOfGovernments *governments;
+    vector<Command> historyOfCommands;
 private:
 	double money;								//казна
 	int number;									//номер государства
 	int countOfTeam;
 	short int happiness;
-    ListOfGovernments *governments;
-
-
-
 };

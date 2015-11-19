@@ -11,6 +11,8 @@
 #include "secretary.h"
 #include <fstream>
 #include <listofgovernments.h>
+#include <QDebug>
+#include <deque>
 
 using namespace std;
 
@@ -25,8 +27,9 @@ void Government::setNumber(int newNumber) { number = newNumber; }
 void Government::setCountOfTeam(int newCountOfTeam) { countOfTeam = newCountOfTeam; }
 void Government::setHappiness(short int newHappiness) { happiness = newHappiness; }
 
-Government::Government(int itsNumber, int itsCountOfTeam, ListOfGovernments *govs, Rialto *rialto, deque<NukeRocket> *nukesInAir)
+Government::Government(Team *team,int itsNumber, int itsCountOfTeam, ListOfGovernments *govs, Rialto *rialto, deque<NukeRocket> *nukesInAir)
 {
+    this->team = team;
     this->nukesInAir = nukesInAir;
     this->rialto = rialto;
     governments = govs;
@@ -87,57 +90,139 @@ void Government::getFullInformation()
 
 int Government::doCommand(Command com)
 {
+    historyOfCommands.push_back(com);
+    Government *enemy;
+    int result;
+
     switch(com.args[0])
     {
     case 1:
         if (ministers[0]->status == 0)
-        return doPresidentCommand(com);
-        else return 0;
+        {
+            result =  doPresidentCommand(com);
+            if (result == 1) return 1;
+            if (result == -1)
+            {
+            }
+        }
+        return 0;
         break;
     case 2:
         if (ministers[1]->status == 0)
-        return doMinFinCommand(com);
-        else return 0;
+    {
+        result = doMinFinCommand(com);
+        if (result == 1) return 1;
+        if (result == -1)
+        {
+            enemy = governments->getPtrToGov((ministers[1]->numberOfEnemy));
+            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+        }
+    }
+    return 0;
         break;
     case 3:
         if (ministers[2]->status == 0)
-        return doMinDefCommand(com);
-        else return 0;
+    {
+        result = doMinDefCommand(com);
+        if (result == 1) return 1;
+        if (result == -1)
+        {
+            enemy = governments->getPtrToGov((ministers[2]->numberOfEnemy));
+            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+        }
+    }
+    return 0;
         break;
     case 4:
         if (ministers[3]->status == 0)
-        return doKGBCommand(com);
-        else return 0;
+    {
+        result = doKGBCommand(com);
+        if (result == 1) return 1;
+        if (result == -1)
+        {
+            enemy = governments->getPtrToGov((ministers[3]->numberOfEnemy));
+            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+        }
+    }
+    return 0;
         break;
     case 5:
         if (ministers[4]->status == 0)
-        return doMIDCommand(com);
-        else return 0;
+    {
+        result = doMIDCommand(com);
+        if (result == 1) return 1;
+        if (result == -1)
+        {
+            enemy = governments->getPtrToGov((ministers[4]->numberOfEnemy));
+            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+        }
+    }
+    return 0;
         break;
     case 6:
         if (ministers[5]->status == 0)
-        return doMinUstCommand(com);
-        else return 0;
+    {
+        result = doMinUstCommand(com);
+        if (result == 1) return 1;
+        if (result == -1)
+        {
+            enemy = governments->getPtrToGov((ministers[5]->numberOfEnemy));
+            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+        }
+    }
+    return 0;
         break;
     case 7:
         if (ministers[6]->status == 0)
-        return doMVDCommand(com);
-        else return 0;
+    {
+        result = doMVDCommand(com);
+        if (result == 1) return 1;
+        if (result == -1)
+        {
+            enemy = governments->getPtrToGov((ministers[6]->numberOfEnemy));
+            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+        }
+    }
+    return 0;
         break;
     case 8:
         if (ministers[7]->status == 0)
-        return doMinComCommand(com);
-        else return 0;
+    {
+        result = doMinComCommand(com);
+        if (result == 1) return 1;
+        if (result == -1)
+        {
+            enemy = governments->getPtrToGov((ministers[7]->numberOfEnemy));
+            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+        }
+    }
+    return 0;
         break;
     case 9:
         if (ministers[8]->status == 0)
-        return doMinHelCommand(com);
-        else return 0;
+    {
+        result = doMinHelCommand(com);
+        if (result == 1) return 1;
+        if (result == -1)
+        {
+            enemy = governments->getPtrToGov((ministers[8]->numberOfEnemy));
+            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+        }
+    }
+    return 0;
         break;
     case 10:
         if (ministers[9]->status == 0)
-        return doSecretaryCommand(com);
-        else return 0;
+    {
+        result = doSecretaryCommand(com);
+        if (result == 1) return 1;
+        if (result == -1)
+        {
+            enemy = governments->getPtrToGov((ministers[9]->numberOfEnemy));
+            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+        }
+    }
+    return 0;
         break;
     }
     return 0;
@@ -443,10 +528,42 @@ void Government::prepare()
         {
             this->setHappiness(0);
         }
+
+        for (int i = 0; i < countOfTeam; i++)
+        {
+            team->recon[i].info.clear();
+        }
 }
 
 void Government::postPrepare()
 {
+
+    qDebug() << "Наш пул команд: " << historyOfCommands.size();
+    ForeignMinister *mid = (ForeignMinister*)(this->ministers[4]);
+    if (mid->trackingTarget[0] != 0)
+    {
+        Government *target;
+        target = governments->getPtrToGov(mid->trackingTarget[0]);
+        qDebug() << "Начинаем слежку! " << QString::number( target->historyOfCommands.size() ) << " " << QString::number( mid->trackingTarget[0] ) <<" "<< QString::number( target->getMoney() );
+        for (int i = 0; i < target->historyOfCommands.size() ; i++)
+        {
+             qDebug() << "Обнаружили цель!";
+            if ( target->historyOfCommands.at(i).args[0] == mid->trackingTarget[1] )
+            {
+                qDebug() << "Обнаружили действие!";
+                team->recon[mid->trackingTarget[0] - 1].info.push_back(target->historyOfCommands.at(i));
+            }
+        }
+
+        if (team->recon[mid->trackingTarget[0] - 1].info.size() > 0)
+        {
+           team->recon[mid->trackingTarget[0] - 1].mode = 1;
+        }
+        mid->trackingTarget[0] = 0;
+        mid->trackingTarget[1] = 0;
+    }
+
+
     Defence *def = (Defence*)(this->ministers[2]);
     def->checkNukes(*this);
 
@@ -460,6 +577,8 @@ void Government::postPrepare()
     {
         this->setHappiness(0);
     }
+
+    historyOfCommands.clear();
 }
 
 int Government::getNukes()

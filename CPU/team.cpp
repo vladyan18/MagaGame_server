@@ -2,16 +2,22 @@
 #include "QFile"
 #include <QTextStream>
 #include <QDebug>
+#include <Anton_CPU/Minister.h>
+#include <Anton_CPU/ForeignMinister.h>
+
 
 int Team::countOfTeams = 1;
 Team::Team(int num, int cOfTeams, ListOfGovernments *govs, Rialto *rialto, deque<NukeRocket> *nukesInAir)
 {
+    qDebug() << "Конструктор тимы";
     this->nukesInAir = nukesInAir;
     this->rialto = rialto;
     numOfTeam = num;
     countOfTeams = cOfTeams;
-    government = new Government(numOfTeam,countOfTeams, govs, rialto, nukesInAir);
+    government = new Government(this,numOfTeam,countOfTeams, govs, rialto, nukesInAir);
     govs->addToList(num,government);
+    recon = new reconInformation[cOfTeams];
+
 }
 
 void Team::addCommand(Command com)
@@ -44,7 +50,6 @@ void Team::readData()
     *temp = inputFile.readAll();
     inputFile.close();
 
-    listOfDidCommands.clear();
     listOfCommands.clear();   
     do
     {
@@ -93,7 +98,6 @@ void Team::writeData()
         }
         stream << listOfDidCommands[i].successful << endl;
     }
-    listOfDidCommands.clear();
     outputFile.close();
 
     outputFile.setFileName(QString::number(numOfTeam) + "_verb_matrix.txt");
@@ -108,6 +112,55 @@ void Team::writeData()
         stream << endl;
     }
     outputFile.close();
+
+    outputFile.setFileName(QString::number(numOfTeam) + "_recon_data.txt");
+    outputFile.open(QFile::WriteOnly);
+    for (int i=0; i<countOfTeams; i++)
+    {
+        if (recon[i].info.size() != 0)
+        {
+            if (recon[i].mode == 1)
+            {
+                qDebug() << "Записываем слежку в файл!";
+                stream << "R " + QString::number(i+1) << endl;
+                for (int j = 0; j < recon[i].info.size(); j++)
+                {
+                    for (int k = 0; k<7; k++)
+                    {
+                        stream << recon[i].info[j].args[k] << " ";
+                    }
+                    stream << endl;
+                }
+            }
+        }
+    }
+
+    for (int i=0; i<countOfTeams; i++)
+    {
+        if (recon[i].greatFail.size() != 0)
+        {
+                qDebug() << "Записываем фейлы в файл!";
+                stream << "F " + QString::number(i+1) << endl;
+                for (int j = 0; j < recon[i].greatFail.size(); j++)
+                {
+                    for (int k = 0; k<7; k++)
+                    {
+                        stream << recon[i].greatFail[j].args[k] << " ";
+                    }
+                    stream << endl;
+                }
+        }
+    }
+    outputFile.close();
+
+    for (int i=0; i<countOfTeams; i++)
+    {
+        recon[i].info.clear();
+        recon[i].greatFail.clear();
+    }
+
+    this->listOfDidCommands.clear();
+    listOfDidCommandsSize = 0;
 }
 
 void Team::prepare()
@@ -129,6 +182,7 @@ int Team::sabotage(int numOfMin)
         if (listOfCommands[i].args[0] == numOfMin)
         {
           listOfDidCommands.push_back(listOfCommands[i]);
+          listOfDidCommandsSize++;
           listOfCommands[i].args[0] = -1;
           listOfCommands[i].args[1] = -1;
           listOfCommands[i].args[2] = -1;
@@ -148,3 +202,10 @@ bool Team::isVerbed(int country, int min)
 {
     return government->isVerbed(country,min);
 }
+
+void Team::updateReconList(int newCountOfTeams)
+{
+    reconInformation *newRecon = new reconInformation[newCountOfTeams];
+    recon = newRecon;
+}
+

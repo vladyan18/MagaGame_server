@@ -28,6 +28,7 @@ public:
     int help(Government &its, Government &getsHelp, int helpNumberOfMinister);
     Government *its;
     int status = 0;
+    int numberOfEnemy = 0;
 protected:
 		double lvl;
 		double helpLvl;					//дополнительный уровень помощи

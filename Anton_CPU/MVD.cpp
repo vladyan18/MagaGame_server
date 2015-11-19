@@ -47,10 +47,14 @@ int MVD::checkVerbed(Government &its)
 
 int MVD::disverbed(Government &its, Government &attack, int numberOfMinister)
 {
+    int luck = 0;
+    this->numberOfEnemy = attack.getNumber();
+
 	if (its.getMoney() >= COST_OF_DISVERBED)
 	{
 		its.setMoney(its.getMoney() - COST_OF_DISVERBED);
-        if (TSOP(getLvl(), attack.ministers[4]->getTSOPlvl(5)))
+        luck = TSOP(getLvl(), attack.ministers[4]->getTSOPlvl(5));
+        if (luck)
 		{
             lvl++;
             Command fr;
@@ -59,10 +63,10 @@ int MVD::disverbed(Government &its, Government &attack, int numberOfMinister)
             fr.args[2] = its.getNumber();
             fr.args[3] = numberOfMinister+1;
             attack.doMIDCommand(fr);
-            return 1;
+            return luck;
 		}
 	}
-    return 0;
+    return luck;
 }
 
 void MVD::getInformation()

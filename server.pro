@@ -55,7 +55,8 @@ HEADERS  += mainwindow.h \
     CPU/rialto.h \
     CPU/nukesinair.h \
     whataboutproofdial.h \
-    Anton_CPU/secretary.h
+    Anton_CPU/secretary.h \
+    CPU/reconinformation.h
 
 
 

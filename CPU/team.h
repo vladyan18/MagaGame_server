@@ -7,10 +7,12 @@
 #include <listofgovernments.h>
 #include <CPU/rialto.h>
 #include <CPU/nukesinair.h>
+#include <CPU/reconinformation.h>
 
 using namespace std;
 class Rialto;
 class NukesInAir;
+class reconInformation;
 
 struct Command
 {
@@ -33,6 +35,7 @@ public:
     void writeData();
     void prepare();
     void postPrepare();
+    void updateReconList(int newCountOfTeams);
     bool isVerbed(int country, int min);
     int sabotage(int numOfMin);
     unsigned int numOfCommands;
@@ -41,12 +44,15 @@ public:
     deque<NukeRocket> *nukesInAir;
 
     deque< Command > listOfDidCommands;
-
+    reconInformation* recon;
+    deque< Command > listOfCommands;
+    static int countOfTeams;
+    int listOfDidCommandsSize;
 
 private:
 
-    static int countOfTeams;
-    deque< Command > listOfCommands;
+
+
 };
 
 

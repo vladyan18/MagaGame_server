@@ -4,7 +4,7 @@
 #include <QDebug>
 using namespace std;
 
-bool TSOP(double attackLvl, double defenceLvl)
+int TSOP(double attackLvl, double defenceLvl)
 {
     double dLvl = attackLvl - defenceLvl; // delta lvl
     qDebug() << "Произошло вычисление по ТСОП. 1:" + QString::number(attackLvl) +" , 2:" + QString::number(defenceLvl);
@@ -20,13 +20,14 @@ bool TSOP(double attackLvl, double defenceLvl)
 
         srand(clock());
         if (chanceToWin >= rand() % 100 + 1)
-			return true;
+            return 1;
 		else
-			return false;
+            return 0;
 
 	}
-	else
+    else if (dLvl < -3)
 	{
-		return false;
+        return -1;
 	}
+    return 0;
 }
