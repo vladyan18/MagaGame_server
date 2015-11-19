@@ -5,7 +5,7 @@
 
 using namespace std;
 
-bool TSOP(double attackLvl, double defenceLvl);
+int TSOP(double attackLvl, double defenceLvl);
 MinisterOfJustice::MinisterOfJustice(Government *its)
 {
     this->its = its;

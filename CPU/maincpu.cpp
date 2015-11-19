@@ -81,7 +81,7 @@ void MainCPU::processData()
 
 }
 
-bool TSOP(double attackLvl, double defenceLvl);
+int TSOP(double attackLvl, double defenceLvl);
 
 void MainCPU::checkForMID(Command *commands)
 {

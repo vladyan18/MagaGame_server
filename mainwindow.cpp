@@ -61,6 +61,16 @@ void MainWindow::on_pushButton_3_clicked()
          inpf.close();
 
 
+         inpf.setFileName(QString::number(i) + "_verb_matrix.txt");
+         inpf.open(QFile::ReadOnly);
+         doc += "\nM \n" + inpf.readAll();
+         inpf.close();
+
+         inpf.setFileName(QString::number(i) + "_recon_data.txt");
+         inpf.open(QFile::ReadOnly);
+         doc += "\nP \n" + inpf.readAll();
+         inpf.close();
+
          listClients[i]->socket->write(doc);
 
         }
@@ -68,21 +78,6 @@ void MainWindow::on_pushButton_3_clicked()
     }
     updateList();
 
-
-
-    for (int i = 1;i<=numOfTeams;i++)
-    {
-        if (listClients[i]->connected)
-        {
-
-         inpf.setFileName(QString::number(i) + "_verb_matrix.txt");
-         inpf.open(QFile::ReadOnly);
-         doc = "M \n" + inpf.readAll();
-         inpf.close();
-
-         listClients[i]->socket->write(doc);
-        }
-    }
 
 
     ui->pushButton_4->setEnabled(true);

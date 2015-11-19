@@ -6,7 +6,7 @@
 
 using namespace std;
 
-bool TSOP(double attackLvl, double defenceLvl);
+int TSOP(double attackLvl, double defenceLvl);
 
 void HealthMinister::setVirus(bool newVirus, int numOfTeam) { virus[numOfTeam-1] = newVirus; }
 bool HealthMinister::getVirus(int numOfTeam) { return virus[numOfTeam-1]; }

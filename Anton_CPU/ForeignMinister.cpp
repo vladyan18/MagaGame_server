@@ -4,7 +4,7 @@
 
 using namespace std;
 
-bool TSOP(double attackLvl, double defenceLvl);
+int TSOP(double attackLvl, double defenceLvl);
 
 ForeignMinister::ForeignMinister(){}
 

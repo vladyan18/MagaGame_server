@@ -5,7 +5,7 @@
 
 using namespace std;
 
-bool TSOP(double attackLvl, double defenceLvl);
+int TSOP(double attackLvl, double defenceLvl);
 
 int Defence::getNuclear() { return nuclear; }
 int Defence::getMissleDefence() { return missileDefense; }
@@ -17,6 +17,7 @@ Defence::Defence() {}
 
 Defence::Defence(Government *its,int countOfTeam, ListOfGovernments *governments)
 {
+    this->lvl = 5;
     this->its = its;
     this->governments = governments;
     this->countOfTeams = countOfTeam;

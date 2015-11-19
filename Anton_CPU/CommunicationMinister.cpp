@@ -4,7 +4,7 @@
 
 using namespace std;
 
-bool TSOP(double attackLvl, double defenceLvl);
+int TSOP(double attackLvl, double defenceLvl);
 
 CommunicationMinister::CommunicationMinister(Government *its, int countOfTeam, ListOfGovernments *govs)
 {
