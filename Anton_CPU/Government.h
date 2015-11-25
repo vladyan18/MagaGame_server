@@ -11,6 +11,7 @@
 #include <CPU/rialto.h>
 #include <CPU/nukesinair.h>
 #include <vector>
+#include <queue>
 
 using namespace std;
 class Team;
@@ -72,6 +73,9 @@ public:
     Team *team;
     ListOfGovernments *governments;
     vector<Command> historyOfCommands;
+    deque<int> underAttack;
+    deque<int> timeUntilWar;
+    double stepOfRebellion;
 private:
 	double money;								//казна
 	int number;									//номер государства

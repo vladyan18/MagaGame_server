@@ -7,17 +7,27 @@
 
 
 int Team::countOfTeams = 1;
+int Team::sumProfitInAgro = 0;
+int Team::sumProfitInLightInd = 0;
+int Team::sumProfitInHeavyInd = 0;
 Team::Team(int num, int cOfTeams, ListOfGovernments *govs, Rialto *rialto, deque<NukeRocket> *nukesInAir)
 {
-    qDebug() << "Конструктор тимы";
+
     this->nukesInAir = nukesInAir;
     this->rialto = rialto;
     numOfTeam = num;
     countOfTeams = cOfTeams;
-    government = new Government(this,numOfTeam,countOfTeams, govs, rialto, nukesInAir);
-    govs->addToList(num,government);
-    recon = new reconInformation[cOfTeams];
 
+    government = new Government(this,numOfTeam,countOfTeams, govs, rialto, nukesInAir);
+    sumProfitInAgro += 1000000;
+    sumProfitInLightInd += 1000000;
+    sumProfitInHeavyInd += 1000000;
+
+    govs->addToList(num,government);
+    recon = new reconInformation[countOfTeams];
+        QFile outputFile(QString::number(numOfTeam)+"_team_output.txt");
+        outputFile.open(QFile::WriteOnly);
+        outputFile.close();
 }
 
 void Team::addCommand(Command com)
@@ -92,11 +102,14 @@ void Team::writeData()
 
     for (int i = 0; i<listOfDidCommands.size();i++)
     {
-        for (int j = 0; j<7;j++)
+        if (listOfDidCommands[i].args[0] != 0)
         {
-            stream<< listOfDidCommands[i].args[j] << " ";
+            for (int j = 0; j<7;j++)
+            {
+                stream<< listOfDidCommands[i].args[j] << " ";
+            }
+            stream << listOfDidCommands[i].successful << endl;
         }
-        stream << listOfDidCommands[i].successful << endl;
     }
     outputFile.close();
 
@@ -135,17 +148,19 @@ void Team::writeData()
         }
     }
 
+
     for (int i=0; i<countOfTeams; i++)
     {
-        if (recon[i].greatFail.size() != 0)
+        qDebug() << recon[i].greatFail->size();
+        if (recon[i].greatFail->size() != 0)
         {
                 qDebug() << "Записываем фейлы в файл!";
                 stream << "F " + QString::number(i+1) << endl;
-                for (int j = 0; j < recon[i].greatFail.size(); j++)
+                for (int j = 0; j < recon[i].greatFail->size(); j++)
                 {
                     for (int k = 0; k<7; k++)
                     {
-                        stream << recon[i].greatFail[j].args[k] << " ";
+                        stream << (recon[i].greatFail->at(j)).args[k] << " ";
                     }
                     stream << endl;
                 }
@@ -156,7 +171,7 @@ void Team::writeData()
     for (int i=0; i<countOfTeams; i++)
     {
         recon[i].info.clear();
-        recon[i].greatFail.clear();
+        recon[i].greatFail->clear();
     }
 
     this->listOfDidCommands.clear();
@@ -165,16 +180,47 @@ void Team::writeData()
 
 void Team::prepare()
 {
+    for (int i = 0; i < countOfTeams; i++)
+    {
+        recon[i].clear();
+    }
+
     government->prepare();
 }
 
 void Team::postPrepare()
 {
+    ForeignMinister *mid = (ForeignMinister*)(government->ministers[4]);
+    if (mid->trackingTarget[0] != 0)
+    {
+        Government *target;
+        target = this->government->governments->getPtrToGov(mid->trackingTarget[0]);
+        qDebug() << "Начинаем слежку! " << QString::number( target->historyOfCommands.size() ) << " " << QString::number( mid->trackingTarget[0] ) <<" "<< QString::number( target->getMoney() );
+        for (int i = 0; i < target->historyOfCommands.size() ; i++)
+        {
+             qDebug() << "Обнаружили цель!";
+            if ( target->historyOfCommands.at(i).args[0] == mid->trackingTarget[1] )
+            {
+                qDebug() << "Обнаружили действие!";
+                recon[mid->trackingTarget[0] - 1].info.push_back(target->historyOfCommands.at(i));
+            }
+        }
+
+        if (recon[mid->trackingTarget[0] - 1].info.size() > 0)
+        {
+           recon[mid->trackingTarget[0] - 1].mode = 1;
+        }
+        mid->trackingTarget[0] = 0;
+        mid->trackingTarget[1] = 0;
+    }
+
+
     government->postPrepare();
 }
 
 int Team::sabotage(int numOfMin)
 {
+    int result = 0;
     qDebug() << "Приступаем к саботажу!";
     for (int i = 0; i<listOfCommands.size();i++)
     {
@@ -191,11 +237,10 @@ int Team::sabotage(int numOfMin)
           listOfCommands[i].args[5] = -1;
           listOfCommands[i].args[6] = -1;
           qDebug() << "Саботаж удался!";
-          return 1;
-
+          result = 1;
         }
     }
-    return 0;
+    return result;
 }
 
 bool Team::isVerbed(int country, int min)
@@ -205,7 +250,15 @@ bool Team::isVerbed(int country, int min)
 
 void Team::updateReconList(int newCountOfTeams)
 {
-    reconInformation *newRecon = new reconInformation[newCountOfTeams];
-    recon = newRecon;
+
+    delete []recon;
+    recon = new reconInformation[newCountOfTeams];
 }
 
+
+void Team::addToGreatFails(int numberOfTeam, Command com)
+{
+
+    recon[numberOfTeam-1].greatFail->push_back(com);
+
+}

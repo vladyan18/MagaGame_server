@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>4.ico</file>
+        <file>flame.ico</file>
+        <file>chili.ico</file>
+        <file>43319.ico</file>
+        <file>midoriglobeicon.ico</file>
+    </qresource>
+</RCC>

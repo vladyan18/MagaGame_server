@@ -13,8 +13,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    connect(&mcpu,SIGNAL(needToUpdateHistory()), &historyDisplay, SLOT(updateData()));
+    this->setFocus();
+    console = new Console(&mcpu);
     _serv = new QTcpServer(this);
-connect(_serv, SIGNAL(newConnection()), this, SLOT(newuser()));
+    connect(_serv, SIGNAL(newConnection()), this, SLOT(newuser()));
 }
 
 MainWindow::~MainWindow()
@@ -224,10 +227,22 @@ void MainWindow::updateList()
 
 void MainWindow::on_pushButton_4_clicked()
 {
+    qDebug() << "Начинаем обработку данных";
     mcpu.processData();
+    qDebug() << "Обработка данных закончена";
     for (int i = 0; i < numOfTeams;i++)
     {
         ui->listWidget->item(i)->setText(ui->listWidget->item(i)->text() + " Обработано");
     }
     ui->pushButton_4->setDisabled(true);
+}
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    console->show();
+}
+
+void MainWindow::on_toolButton_clicked()
+{
+    historyDisplay.show();
 }

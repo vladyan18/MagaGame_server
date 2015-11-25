@@ -13,7 +13,7 @@ MinisterOfJustice::MinisterOfJustice(Government *its)
 
 int MinisterOfJustice::sue(Government &its, Government &attack, bool proof)
 {
-    int luck = 0;
+    int luck = 0, helpInSue = 0;
     this->numberOfEnemy = attack.getNumber();
 
     QMessageBox *isItProof = new QMessageBox(
@@ -29,9 +29,9 @@ int MinisterOfJustice::sue(Government &its, Government &attack, bool proof)
 	{
 		its.setMoney(its.getMoney() - COST_OF_SUE);
         if (n == QMessageBox::Yes)
-			helpLvl++;
-        luck = TSOP(getLvl(), attack.ministers[5]->getTSOPlvl(6));
-        if (luck)
+            helpInSue = 1;
+        luck = TSOP(getLvl() + helpInSue, attack.ministers[5]->getTSOPlvl(6));
+        if (luck > 0)
 		{
 			lvl++;
 			attack.setHappiness(attack.getHappiness() - DECREASE_HAPPINESS_BY_SUE);

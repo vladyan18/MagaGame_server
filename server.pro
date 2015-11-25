@@ -32,7 +32,9 @@ SOURCES += main.cpp\
     listofgovernments.cpp \
     CPU/rialto.cpp \
     whataboutproofdial.cpp \
-    Anton_CPU/secretary.cpp
+    Anton_CPU/secretary.cpp \
+    historydisplay.cpp \
+    console.cpp
 
 
 
@@ -56,10 +58,19 @@ HEADERS  += mainwindow.h \
     CPU/nukesinair.h \
     whataboutproofdial.h \
     Anton_CPU/secretary.h \
-    CPU/reconinformation.h
+    CPU/reconinformation.h \
+    command.h \
+    historydisplay.h \
+    console.h
 
 
 
 
 FORMS    += mainwindow.ui \
-    whataboutproofdial.ui
+    whataboutproofdial.ui \
+    historydisplay.ui \
+    console.ui
+
+RESOURCES += \
+    res.qrc
+RC_ICONS += chili.ico

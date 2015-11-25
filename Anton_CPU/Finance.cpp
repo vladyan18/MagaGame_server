@@ -18,33 +18,72 @@ int Finance::increaseSphere(Government &its, int numberOfSphere, int number2OfSp
 
 	if (its.getMoney() >= COST_OF_INCREASE_ECONOMIC)
 	{
-        its.setMoney(its.getMoney() - COST_OF_INCREASE_ECONOMIC);
-		switch (numberOfSphere)
-		{
-		case 1:
-			agriculture += SPHERE_INCREASE;
-			break;
-		case 2:
-			heavyIndustry += SPHERE_INCREASE;
-			break;
-		case 3:
-			lightIndustry += SPHERE_INCREASE;
-			break;
-		}
+        int *sphere, *sphere2, result = 0;
+        switch (numberOfSphere)
+        {
+        case 1:
+            sphere = &(its.team->sumProfitInAgro);
+            break;
+        case 2:
+            sphere = &(its.team->sumProfitInHeavyInd);
+            break;
+        case 3:
+            sphere = &(its.team->sumProfitInLightInd);
+            break;
+        }
 
         switch (number2OfSphere)
         {
         case 1:
-            agriculture += SPHERE_INCREASE;
+            sphere2 = &(its.team->sumProfitInAgro);
             break;
         case 2:
-            heavyIndustry += SPHERE_INCREASE;
+            sphere2 = &(its.team->sumProfitInHeavyInd);
             break;
         case 3:
-            lightIndustry += SPHERE_INCREASE;
+            sphere2 = &(its.team->sumProfitInLightInd);
             break;
         }
-        return 1;
+
+        if (*sphere < its.team->countOfTeams * 2000000)
+        {
+        its.setMoney(its.getMoney() - COST_OF_INCREASE_ECONOMIC/2);
+		switch (numberOfSphere)
+            {
+            case 1:
+                agriculture += SPHERE_INCREASE;
+                break;
+            case 2:
+                heavyIndustry += SPHERE_INCREASE;
+                break;
+            case 3:
+                lightIndustry += SPHERE_INCREASE;
+                break;
+
+            }
+        *sphere += SPHERE_INCREASE;
+        result = 1;
+        }
+
+        if (*sphere2 < its.team->countOfTeams *2000000)
+        {
+        its.setMoney(its.getMoney() - COST_OF_INCREASE_ECONOMIC/2);
+        switch (number2OfSphere)
+            {
+            case 1:
+                agriculture += SPHERE_INCREASE;
+                break;
+            case 2:
+                heavyIndustry += SPHERE_INCREASE;
+                break;
+            case 3:
+                lightIndustry += SPHERE_INCREASE;
+                break;
+            }
+        result = 1;
+        }
+        *sphere2 += SPHERE_INCREASE;
+        return result;
 	}
     else
     {
@@ -57,13 +96,13 @@ int Finance::play(Government &its, int price, int money)
     if (its.getMoney() >= money)
     {
         its.changeMoney( -money );
-        qDebug() << "Добавили игрока в биржу";
+
         its.rialto->addPlayer(its.getNumber(), this->getLvl(), money, price);
         return 1;
     }
     else
     {
-        qDebug() << "Биржа, неудача";
+
         return 0;
     }
     return 1;
@@ -75,7 +114,7 @@ int Finance::doTrans(Government &its, Government &to, int money)
     {
         its.changeMoney(-money);
         to.changeMoney( money );
-        to.outCodes += "205 " + QString::number( int(money*0.9) ) + " " + QString::number( its.getNumber() ) + " ";
+        to.outCodes += "205 " + QString::number( money ) + " " + QString::number( its.getNumber() ) + " ";
         return 1;
     }
     else {return 0;}
@@ -123,6 +162,7 @@ Finance::Finance(Government *its)
 	agriculture = START_SPHERE;
 	heavyIndustry = START_SPHERE;
 	lightIndustry = START_SPHERE;
+
 }
 
 void Finance::getInformation()

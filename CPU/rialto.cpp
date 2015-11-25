@@ -1,6 +1,7 @@
 #include "rialto.h"
 #include <stdlib.h>
 #include <time.h>
+#include <QTime>
 #include <cmath>
 #include <QDebug>
 using namespace std;
@@ -38,8 +39,9 @@ void Rialto::processData()
 
         midForce = sForces / (players.size()*10);
 
-        srand( time(NULL) );
-        randBet = ( (random() & 201) - 100);
+        QTime midnight(0,0,0);
+        qsrand(midnight.secsTo(QTime::currentTime()));
+        randBet = ( (qrand() & 201) - 100);
         qDebug() << "Случайная цена: " << randBet;
         qDebug() << "Фиктивная сила: " << midForce;
         sMoments +=  randBet * midForce;

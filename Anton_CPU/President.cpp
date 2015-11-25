@@ -1,5 +1,6 @@
 #include "Government.h"
 #include "President.h"
+#include <QDebug>
 #include <fstream>
 #include <cmath>
 
@@ -34,4 +35,5 @@ President::President(Government *its, ListOfGovernments *govs)
     this->its = its;
     this->governments = govs;
     lvl = 1;
+
 }

@@ -16,12 +16,22 @@ int MVD::suppressRebellion(Government &its)
 {
 	if (its.getMoney() >= COST_OF_SUPRESS_REBELLION)
 	{
-        if (its.isInRebellion) {its.outCodes += "203 ";}
-        else {its.outCodes += "204 ";}
+        if (its.isInRebellion)
+        {
+            its.outCodes += "203 ";
+            if (its.getHappiness() < 50)
+            its.setHappiness(50);
+        }
+        else
+        {
+            its.outCodes += "204 ";
+            its.setHappiness(its.getHappiness() - DECREASE_HAPPINESS_AFTER_SUPRESS);
+        }
 
 		its.setMoney(its.getMoney() - COST_OF_SUPRESS_REBELLION);
         its.isInRebellion = false;
-        its.setHappiness(its.getHappiness() - DECREASE_HAPPINESS_AFTER_SUPRESS);
+        its.stepOfRebellion = 0;
+
         return 1;
 	}
     return 0;
@@ -54,7 +64,7 @@ int MVD::disverbed(Government &its, Government &attack, int numberOfMinister)
 	{
 		its.setMoney(its.getMoney() - COST_OF_DISVERBED);
         luck = TSOP(getLvl(), attack.ministers[4]->getTSOPlvl(5));
-        if (luck)
+        if (luck > 0)
 		{
             lvl++;
             Command fr;

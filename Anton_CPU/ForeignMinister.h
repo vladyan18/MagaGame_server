@@ -21,7 +21,7 @@ public:
 	void getInformation(int countOfTeam);
     bool **verbedList;
     void updateVerbedList(int countOfTeam);
-    int trackingTarget[2] = {0,0};
+    int trackingTarget[2];
 private:
     int countOfTeam;
 };

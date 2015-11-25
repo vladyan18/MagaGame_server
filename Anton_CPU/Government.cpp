@@ -16,6 +16,8 @@
 
 using namespace std;
 
+int TSOP(double attackLvl, double defenceLvl);
+
 double Government::getMoney() { return money; }
 int Government::getNumber() { return number; }
 int Government::getCountOfTeam() { return countOfTeam; }
@@ -29,15 +31,18 @@ void Government::setHappiness(short int newHappiness) { happiness = newHappiness
 
 Government::Government(Team *team,int itsNumber, int itsCountOfTeam, ListOfGovernments *govs, Rialto *rialto, deque<NukeRocket> *nukesInAir)
 {
+
     this->team = team;
     this->nukesInAir = nukesInAir;
     this->rialto = rialto;
+
     governments = govs;
 	number = itsNumber;
 	countOfTeam = itsCountOfTeam;
 	money = START_MONEY;
 	happiness = MAX_HAPPINESS;
     outCodes = "215 ";
+
     ministers[0] = new President(this,governments);
     ministers[1] = new Finance(this);
     ministers[2] = new Defence(this,countOfTeam, governments);
@@ -111,11 +116,12 @@ int Government::doCommand(Command com)
         if (ministers[1]->status == 0)
     {
         result = doMinFinCommand(com);
+        qDebug() << "Результат по ТСОП " << QString::number(result);
         if (result == 1) return 1;
         if (result == -1)
         {
             enemy = governments->getPtrToGov((ministers[1]->numberOfEnemy));
-            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+            enemy->team->recon[this->getNumber()-1].greatFail->push_back(com);
         }
     }
     return 0;
@@ -128,7 +134,7 @@ int Government::doCommand(Command com)
         if (result == -1)
         {
             enemy = governments->getPtrToGov((ministers[2]->numberOfEnemy));
-            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+            enemy->team->recon[this->getNumber()-1].greatFail->push_back(com);
         }
     }
     return 0;
@@ -141,7 +147,7 @@ int Government::doCommand(Command com)
         if (result == -1)
         {
             enemy = governments->getPtrToGov((ministers[3]->numberOfEnemy));
-            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+            enemy->team->recon[this->getNumber()-1].greatFail->push_back(com);
         }
     }
     return 0;
@@ -153,8 +159,9 @@ int Government::doCommand(Command com)
         if (result == 1) return 1;
         if (result == -1)
         {
-            enemy = governments->getPtrToGov((ministers[4]->numberOfEnemy));
-            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+            enemy = governments->getPtrToGov((this->ministers[4]->numberOfEnemy));
+            //enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+            (enemy->team->recon[this->getNumber()-1]).addToGreatFail(com);
         }
     }
     return 0;
@@ -167,7 +174,7 @@ int Government::doCommand(Command com)
         if (result == -1)
         {
             enemy = governments->getPtrToGov((ministers[5]->numberOfEnemy));
-            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+            enemy->team->recon[this->getNumber()-1].greatFail->push_back(com);
         }
     }
     return 0;
@@ -180,7 +187,7 @@ int Government::doCommand(Command com)
         if (result == -1)
         {
             enemy = governments->getPtrToGov((ministers[6]->numberOfEnemy));
-            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+            enemy->team->recon[this->getNumber()-1].greatFail->push_back(com);
         }
     }
     return 0;
@@ -193,7 +200,7 @@ int Government::doCommand(Command com)
         if (result == -1)
         {
             enemy = governments->getPtrToGov((ministers[7]->numberOfEnemy));
-            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+            enemy->team->recon[this->getNumber()-1].greatFail->push_back(com);
         }
     }
     return 0;
@@ -206,7 +213,7 @@ int Government::doCommand(Command com)
         if (result == -1)
         {
             enemy = governments->getPtrToGov((ministers[8]->numberOfEnemy));
-            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+            enemy->team->recon[this->getNumber()-1].greatFail->push_back(com);
         }
     }
     return 0;
@@ -219,7 +226,7 @@ int Government::doCommand(Command com)
         if (result == -1)
         {
             enemy = governments->getPtrToGov((ministers[9]->numberOfEnemy));
-            enemy->team->recon[this->getNumber()-1].greatFail.push_back(com);
+            enemy->team->recon[this->getNumber()-1].greatFail->push_back(com);
         }
     }
     return 0;
@@ -474,15 +481,8 @@ int Government::doSecretaryCommand(Command com)
 
 void Government::prepare()
 {
-
-        CommunicationMinister *com = (CommunicationMinister*)(this->ministers[7]);
-        for (int i = 0; i < countOfTeam; i++)
-        {
-            if (com->itsSlander[i]) {this->setHappiness(this->getHappiness() - 10);}
-        }
-
-        Defence *def = (Defence*)(this->ministers[2]);
-        outCodes = "";
+    outCodes = "";
+    this->countOfTeam = team->countOfTeams;
 
         for (int i = 0; i<COUNT_OF_MINISTER; i++)
         {
@@ -491,6 +491,7 @@ void Government::prepare()
             ministers[i]->status -= 1;
         }
 
+        Defence *def = (Defence*)(this->ministers[2]);
         Finance *fin = (Finance*)(this->ministers[1]);
         int budget = fin->getAgriculture() + fin->getHeavyIndustry()
                 + fin->getLightIndustry();
@@ -509,9 +510,6 @@ void Government::prepare()
 
         this->setMoney(getMoney() + budget);
 
-        HealthMinister *hel = (HealthMinister*)(this->ministers[8]);
-        hel->doHarmFromViruses();
-
         for (int i = 0; i<10; i++)
         {
             for (int j = 0; j < countOfTeam; j++)
@@ -523,60 +521,101 @@ void Government::prepare()
         MinisterFSB *kgb = (MinisterFSB*)(this->ministers[3]);
         kgb->kgbPower = 100;
         kgb->isDefending = false;
+        for (int i = 0; i<10; i++)
+        ministers[i]->setRecruitLvl(0);
 
         if(this->getHappiness() < 0)
         {
             this->setHappiness(0);
         }
 
-        for (int i = 0; i < countOfTeam; i++)
-        {
-            team->recon[i].info.clear();
-        }
 }
 
 void Government::postPrepare()
 {
-
-    qDebug() << "Наш пул команд: " << historyOfCommands.size();
-    ForeignMinister *mid = (ForeignMinister*)(this->ministers[4]);
-    if (mid->trackingTarget[0] != 0)
-    {
-        Government *target;
-        target = governments->getPtrToGov(mid->trackingTarget[0]);
-        qDebug() << "Начинаем слежку! " << QString::number( target->historyOfCommands.size() ) << " " << QString::number( mid->trackingTarget[0] ) <<" "<< QString::number( target->getMoney() );
-        for (int i = 0; i < target->historyOfCommands.size() ; i++)
-        {
-             qDebug() << "Обнаружили цель!";
-            if ( target->historyOfCommands.at(i).args[0] == mid->trackingTarget[1] )
-            {
-                qDebug() << "Обнаружили действие!";
-                team->recon[mid->trackingTarget[0] - 1].info.push_back(target->historyOfCommands.at(i));
-            }
-        }
-
-        if (team->recon[mid->trackingTarget[0] - 1].info.size() > 0)
-        {
-           team->recon[mid->trackingTarget[0] - 1].mode = 1;
-        }
-        mid->trackingTarget[0] = 0;
-        mid->trackingTarget[1] = 0;
-    }
-
-
     Defence *def = (Defence*)(this->ministers[2]);
     def->checkNukes(*this);
+
+    HealthMinister *hel = (HealthMinister*)(this->ministers[8]);
+    hel->doHarmFromViruses();
+
+    CommunicationMinister *com = (CommunicationMinister*)(this->ministers[7]);
+    for (int i = 0; i < countOfTeam; i++)
+    {
+        if (com->itsSlander[i]) {this->setHappiness(this->getHappiness() - 10);}
+    }
 
     if (this->happiness < 50)
     {
         this->isInRebellion = true;
+        this->stepOfRebellion = 1;
         this->outCodes += "202 ";
+    }
+
+    if (this->isInRebellion)
+    {
+        this->setAgricultural(this->getAgricultural() * (100 - stepOfRebellion) / 100);
+        this->setHeavyIndustrial(this->getHeavyIndustrial() * (100 - stepOfRebellion) / 100);
+        this->setLightIndustrial(this->getLightIndustrial() * (100 - stepOfRebellion) / 100);
+        this->setMoney(this->getMoney() * (100 - stepOfRebellion) / 100);
+        this->setNukes(ceil(this->getNukes() * (100 - stepOfRebellion) / 100));
+        this->setPRO(ceil(this->getMissles() * (100 - stepOfRebellion) / 100));
+        stepOfRebellion++;
     }
 
     if(this->getHappiness() < 0)
     {
         this->setHappiness(0);
     }
+
+    if (this->underAttack.size() > 0)
+    {
+        for (unsigned int i = 0; i < this->underAttack.size(); i++)
+        {
+            this->timeUntilWar[i] -= 1;
+            if (this->timeUntilWar[i] == 0)
+            {
+                Government *attacker = governments->getPtrToGov(this->underAttack[i]);
+                int luck;
+                luck = TSOP(attacker->ministers[2]->getTSOPlvl(3), this->ministers[0]->getTSOPlvl(1) + this->ministers[2]->getTSOPlvl(3));
+                if (luck > 0)
+                {
+                    this->setMoney(this->getMoney() / 2);
+
+                    this->setAgricultural(this->getAgricultural() / 2);
+                    this->setHeavyIndustrial(this->getHeavyIndustrial() / 2);
+                    this->setLightIndustrial(this->getLightIndustrial() / 2);
+
+                    for (int i = 0; i< 10; i++)
+                    {
+                        this->ministers[i]->setLvl(this->ministers[i]->getLvl() / 2);
+                        if (this->ministers[i]->getLvl() < 1) this->ministers[i]->setLvl(1);
+
+                        if (this->ministers[i]->getLvl() > attacker->ministers[i]->getLvl())
+                        {
+                            attacker->ministers[i]->setLvl(attacker->ministers[i]->getLvl() + ceil((this->ministers[i]->getLvl() - attacker->ministers[i]->getLvl())/2) );
+                        }
+                    }
+                    this->setNukes(this->getNukes() / 2);
+                    this->setHappiness(this->getHappiness() / 2);
+                    this->setPRO(this->getMissles() / 2);
+                    this->outCodes += QString::number(500)  + " " + QString::number(attacker->getNumber() ) + " ";
+                    attacker->outCodes += "309 " + QString::number( this->getNumber() ) + " ";
+                    attacker->ministers[2]->increaseLvl(*attacker);
+                }
+                else
+                {
+                    attacker->setHappiness(attacker->getHappiness() - 10);
+                    attacker->outCodes += "311 " + QString::number(this->getNumber()) + " ";
+                    this->outCodes += "312 " + QString::number(attacker->getNumber()) + " ";
+                }
+
+                underAttack.pop_front();
+                timeUntilWar.pop_front();
+            }
+        }
+    }
+
 
     historyOfCommands.clear();
 }

@@ -8,17 +8,12 @@
 #include <CPU/rialto.h>
 #include <CPU/nukesinair.h>
 #include <CPU/reconinformation.h>
+#include <command.h>
 
 using namespace std;
 class Rialto;
 class NukesInAir;
 class reconInformation;
-
-struct Command
-{
-    int args[7];
-    int successful = 0;
-};
 
 class Government;
 class ListOfGovernments;
@@ -35,6 +30,8 @@ public:
     void writeData();
     void prepare();
     void postPrepare();
+    void addToGreatFails(int numberOfTeam, Command com);
+
     void updateReconList(int newCountOfTeams);
     bool isVerbed(int country, int min);
     int sabotage(int numOfMin);
@@ -44,9 +41,12 @@ public:
     deque<NukeRocket> *nukesInAir;
 
     deque< Command > listOfDidCommands;
-    reconInformation* recon;
+    reconInformation *recon;
     deque< Command > listOfCommands;
     static int countOfTeams;
+    static int sumProfitInAgro;
+    static int sumProfitInLightInd;
+    static int sumProfitInHeavyInd;
     int listOfDidCommandsSize;
 
 private:

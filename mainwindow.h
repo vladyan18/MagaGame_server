@@ -7,6 +7,8 @@
 #include <QtWidgets>
 #include <QObject>
 #include <CPU/maincpu.h>
+#include <console.h>
+#include <historydisplay.h>
 
 
 
@@ -41,10 +43,18 @@ private slots:
 
     void on_pushButton_4_clicked();
 
+    void on_pushButton_5_clicked();
+    void on_toolButton_clicked();
+
+signals:
+    void needToUpdateHistory();
 private:
     Ui::MainWindow *ui;
    QTcpServer *_serv;
+
     MainCPU mcpu;
+    Console *console;
+    HistoryDisplay historyDisplay;
    void updateList();
 };
 

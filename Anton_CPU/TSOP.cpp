@@ -6,7 +6,7 @@ using namespace std;
 
 int TSOP(double attackLvl, double defenceLvl)
 {
-    double dLvl = attackLvl - defenceLvl; // delta lvl
+    double dLvl = ceil(attackLvl - defenceLvl); // delta lvl
     qDebug() << "Произошло вычисление по ТСОП. 1:" + QString::number(attackLvl) +" , 2:" + QString::number(defenceLvl);
 
     if (dLvl >= 0)

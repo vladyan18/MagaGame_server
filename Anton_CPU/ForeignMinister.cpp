@@ -10,6 +10,8 @@ ForeignMinister::ForeignMinister(){}
 
 ForeignMinister::ForeignMinister(Government *its, int countOfTeam)
 {
+    this->trackingTarget[0] = 0;
+    this->trackingTarget[1] = 0;
     this->its = its;
     this->countOfTeam = countOfTeam;
 	verbedList = new bool*[countOfTeam];
@@ -27,10 +29,7 @@ ForeignMinister::ForeignMinister(Government *its, int countOfTeam)
     }
 }
 
-// доработать 
-int ForeignMinister::sabotage(Government &its, Government &attack, int numOfMinister)
-{
-}
+// РґРѕСЂР°Р±РѕС‚Р°С‚СЊ 
 
 int ForeignMinister::verb(Government &its, Government &attack, int numberOfMinister)
 {
@@ -56,9 +55,10 @@ int ForeignMinister::verb(Government &its, Government &attack, int numberOfMinis
             }
         }
 	}
+    qDebug() << "РџРѕРїС‹С‚РєР° РІРµСЂР±РѕРІРєРё РЅРµ СѓРґР°Р»Р°СЃСЊ!";
     return luck;
 }
-//дописать
+//РґРѕРїРёСЃР°С‚СЊ
 int ForeignMinister::reverb(Government &its, Government &attack, int numberOfMinister)
 {   if(attack.ministers[numberOfMinister]->getWhooseRecruit() == its.getNumber())
     {
@@ -68,9 +68,8 @@ int ForeignMinister::reverb(Government &its, Government &attack, int numberOfMin
     return 1;
     } else {return 0;}
 }
-//дописать
-int ForeignMinister::order() {}
-//дописать
+
+//РґРѕРїРёСЃР°С‚СЊ
 int ForeignMinister::kill(Government &its, Government &attack, int numberOfMinister)
 {
     int luck = 0;
@@ -79,21 +78,21 @@ int ForeignMinister::kill(Government &its, Government &attack, int numberOfMinis
 	if ((its.getMoney() >= COST_OF_KILL))
 	{
 		its.setMoney(its.getMoney() - COST_OF_KILL);
-        luck = TSOP(getOurTSOPLvl(4), attack.ministers[numberOfMinister]->getTSOPlvl(numberOfMinister+1));
-        if (luck)
+        luck = TSOP(getOurTSOPLvl(4), attack.ministers[numberOfMinister]->getTSOPlvl(numberOfMinister+1) + attack.ministers[numberOfMinister]->getRecruitLvl());
+        if (luck > 0)
 		{
 			lvl++;
             attack.ministers[numberOfMinister]->setLvl(1);
             attack.ministers[numberOfMinister]->status = 2;
             verbedList[attack.getNumber()-1][numberOfMinister] = false;
             attack.ministers[numberOfMinister]->setWhooseRecruit(-1);
-            attack.outCodes += QString::number(110) + " " + QString::number(numberOfMinister +1);
+            attack.outCodes += QString::number(110) + " " + QString::number(numberOfMinister +1) + " ";
             return luck;
 		}
 	}
     return luck;
 }
-//доделать
+//РґРѕРґРµР»Р°С‚СЊ
 int ForeignMinister::track(Government &its, Government &attack, int numberOfMinister)
 {
     int luck = 0;
@@ -102,8 +101,8 @@ int ForeignMinister::track(Government &its, Government &attack, int numberOfMini
 	if ((its.getMoney() >= COST_OF_TRACK))
 	{
 		its.setMoney(its.getMoney() - COST_OF_TRACK);
-        luck = TSOP(getTSOPlvl(4), attack.ministers[numberOfMinister]->getTSOPlvl(numberOfMinister+1));
-        if (luck)
+        luck = TSOP(getTSOPlvl(4), attack.ministers[numberOfMinister]->getTSOPlvl(numberOfMinister+1) + attack.ministers[numberOfMinister]->getRecruitLvl());
+        if (luck > 0)
 		{
             this->trackingTarget[0] = attack.getNumber();
             this->trackingTarget[1] = numberOfMinister + 1;

@@ -18,12 +18,15 @@ public:
     void  addTeam(int numberOfTeam);
     Rialto *rialto;
     void processData();
+    vector<Team> teams;
+    void saveInHistory(int numberOfTeam, Command command);
 signals:
     void signalNewCountOfTeams(int newCount);
+    void needToUpdateHistory();
 
 private:
-    vector<Team> teams;
     void checkForMID(Command []);
+    int gameTime;
 };
 
 #endif // MAINCPU_H

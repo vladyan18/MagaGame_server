@@ -33,12 +33,15 @@ int CommunicationMinister::accuse(Government &its, Government &attack)
         {
            case 1:
             {
-                CommunicationMinister *attackCommunicationMinister = (CommunicationMinister*)(its.ministers[7]);
+                CommunicationMinister *attackCommunicationMinister = (CommunicationMinister*)(attack.ministers[7]);
                 attackCommunicationMinister->setItsSlander(true, its.getNumber());
                 attack.outCodes += "200 ";
                 lvl++;
                 return 1;
             }
+        case 0:
+            if (attack.ministers[7]->getLvl() < getLvl()) {attack.ministers[7]->increaseLvl(attack);}
+        break;
            case -1:
             {
                 return -1;
@@ -49,6 +52,7 @@ int CommunicationMinister::accuse(Government &its, Government &attack)
     {
         return 0;
     }
+    return 0;
 }
 
 int CommunicationMinister::disslander(Government &its)
@@ -65,7 +69,7 @@ int CommunicationMinister::disslander(Government &its)
             {
                 its.setMoney(its.getMoney() - COST_OF_DISSLANDER);
                 luck = (TSOP(getOurTSOPLvl(8), attack->ministers[7]->getTSOPlvl(8)));
-                if ( luck &&
+                if ( luck > 0 &&
                     (getItsSlander(attack->getNumber())))
                 {
                     lvl++;
@@ -77,6 +81,10 @@ int CommunicationMinister::disslander(Government &its)
                 }
                 else
                 {
+                    if (luck == 0)
+                    {
+                             if (attack->ministers[7]->getLvl() < getLvl()) {attack->ministers[7]->increaseLvl(*attack);}
+                    }
                     return luck;
                 }
             }
@@ -113,11 +121,14 @@ int CommunicationMinister::fireRebellion(Government &its, Government &attack, in
 		{
 			its.setMoney(its.getMoney() - COST_OF_FIRE_REBELLION);
             luck = TSOP(getOurTSOPLvl(8), attack.ministers[7]->getTSOPlvl(8) + attack.ministers[6]->getTSOPlvl(7));
-            if (luck)
+            if (luck > 0)
 			{
 				lvl++;
                 attack.setHappiness(attack.getHappiness() - 10);
                 result++;
+            } else if (luck == 0)
+            {
+                 if (attack.ministers[7]->getLvl() < getLvl()) {attack.ministers[7]->increaseLvl(attack);}
             }
 		}
     return luck;

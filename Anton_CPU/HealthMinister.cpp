@@ -19,7 +19,7 @@ HealthMinister::HealthMinister(Government *its, int countOfTeam)
 
     this->its = its;
     this->countOfTeams = its->getCountOfTeam();
-    qDebug() << "MinHelDebug: " << QString::number(this->countOfTeams);
+
 	virus = new bool[countOfTeam];
 	stepOfVirus = new int[countOfTeam];
 
@@ -39,10 +39,11 @@ int HealthMinister::infectingVirus(Government &its, Government &attack)
 	{
 		its.setMoney(its.getMoney() - COST_OF_INFECTING);
         luck = TSOP(getLvl(), attack.ministers[8]->getTSOPlvl(9));
-        if (luck)
+        if (luck > 0)
 		{
             HealthMinister *attackHealthMinister = (HealthMinister*)(attack.ministers[8]);
             attackHealthMinister->setVirus(true, its.getNumber());
+            attackHealthMinister->setStepOfVirus(1, its.getNumber());
             attack.outCodes += "208 ";
 			lvl++;
             return luck;
@@ -62,7 +63,7 @@ int HealthMinister::vaccine(Government &its, Government &attack)
         if (virus[attack.getNumber() - 1])
         {
             luck = TSOP(getLvl(), attack.ministers[8]->getTSOPlvl(9));
-            if (luck)
+            if (luck > 0)
 			{
                 virus[attack.getNumber() - 1 ] = false;
                 stepOfVirus[attack.getNumber() - 1] = 1;
@@ -80,13 +81,12 @@ void HealthMinister::getInformation(int countOfTeam)
 
 void HealthMinister::doHarmFromViruses()
 {
-    qDebug() << "Проверка на вирусы: " << QString::number(countOfTeams);
+
     for (int i = 0; i< this->countOfTeams; i++)
     {
-        qDebug() << virus[i] << "!";
         if (virus[i])
         {
-            qDebug() << "Обнаружен вирус!";
+
             its->setHappiness(its->getHappiness() - pow(2,stepOfVirus[i]) );
             stepOfVirus[i]++;
         }
